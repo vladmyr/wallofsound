@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{{ title }}</title>
+        <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="/vendor/bootflat/css/bootflat.min.css">
+        <link rel="stylesheet" href="/stylesheets/style.css">
+    </head>
+    <body>
+        <nav class="navbar navbar-custom navbar-fixed-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">WallOfSound</a>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/login">login</a></li>
+                    <li>
+                        <button type="button" class="navbar-toggle">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="container fixed-top-offset">
+            {{{ yield }}}
+        </div>
+        <footer>
+
+        </footer>
+    </body>
+</html>

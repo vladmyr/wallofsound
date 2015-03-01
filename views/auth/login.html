@@ -1,0 +1,18 @@
+<h3 class="text-center">{{title}}</h3>
+<form action="/join" method="POST" class="contains-background-layer">
+    <div class="form-group">
+        <label>Email</label>
+        <input type="text" class="form-control" name="email" placeholder="you@email.com" required>
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input type="password" class="form-control" name="password" placeholder="secret-password" required>
+    </div>
+    <div class="form-group">
+        <p>New user? Click here to <a href="/join">sign up</a>!</p>
+    </div>
+    <input type="submit" class="btn btn-default" value="Join">
+    <div class="background-el bottom-right">
+        <span class="glyphicon-background glyphicon glyphicon-music glyphicon-xl"></span>
+    </div>
+</form>
