@@ -6,9 +6,11 @@ UserSchema = new mongoose.Schema({
     isLocked: { type: Boolean, required: true },
     userRole: { type: Number, required: true }
 });
-UserSchema.methods.hashPassword = function(password, callback){
+UserSchema.methods.hashPassword = function (password, callback){
+    //execute encryption 5 times in a loop to generate salt
     bcrypt.genSalt(5, function(error, salt){
-        if(error) return callback(error);
+        if (error) return callback(error);
+        //hash password with salt
         bcrypt.hash(password, salt, null, function(error, hash){
             if(error) return callback(error);
             callback(err, hash);
