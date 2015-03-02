@@ -1,2 +1,6 @@
 *.iml
 .idea/
+*.njsproj
+*.dat
+*.sln
+obj/Debug/wallofsound011.njsproj.FileListAbsolute.txt

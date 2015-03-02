@@ -1,5 +1,6 @@
 <h3 class="text-center">{{title}}</h3>
-<form action="/join" method="POST" class="contains-background-layer">
+<form action="/login" method="POST" class="contains-background-layer">
+    <input type="hidden" name="_csrf" value="{{_csrf}}"/>
     <div class="form-group">
         <label>Email</label>
         <input type="text" class="form-control" name="email" placeholder="you@email.com" required>
@@ -9,7 +10,8 @@
         <input type="password" class="form-control" name="password" placeholder="secret-password" required>
     </div>
     <div class="form-group">
-        <p>New user? Click here to <a href="/join">sign up</a>!</p>
+        <p>New user? Click here to <a href="/join">sign up</a>!
+        </p>
     </div>
     <input type="submit" class="btn btn-default" value="Join">
     <div class="background-el bottom-right">
