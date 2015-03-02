@@ -19,45 +19,10 @@ passport.deserializeUser(function (id, callback) {
 /* 
  * strategies 
  */
-//local authorization using session and cookies
-passport.use("local", new passportLocal.Strategy(function (email, password, callback) {
-    UserRepository.findOneByEmail(email, function (error, userSchema) {
-        if (!userSchema) {
-            return callback(null, false);
-        } else {
-            UserSchema.methods.verifyPassword(userSchema.password, password, function (error, isMatch) {
-                if (error) {
-                    return callback(error);
-                } else if (!isMatch) {
-                    return callback(null, false);
-                } else {
-                    return callback(null, UserSchema.methods.toUser(userSchema));
-                }
-            });
-        }
-    });
-}));
+passport.use("local", new passportLocal.Strategy(verifyCredentials)); //local authorization using session and cookies
+passport.use("http", new passportHttp.BasicStrategy(verifyCredentials)); //http authorization for web services
 
-//http authorization for web services
-passport.use("http", new passportHttp.BasicStrategy(function(email, password, callback){
-    UserRepository.findOneByEmail(email, function(error, userSchema){
-        if(!userSchema){
-            return callback(null, false);
-        }else{
-            UserSchema.methods.verifyPassword(userSchema.password, password, function(error, isMatch){
-                if(error) {
-                    return callback(error);
-                }else if(!isMatch){
-                    return callback(null, false);
-                }else{
-                    return callback(null, UserSchema.methods.toUser(userSchema));
-                }
-            });
-        }
-    });
-}));
-
-passport.use("client-basic", new passportHttp.BasicStrategy(function(name, secret, callback){
+passport.use("client", new passportOAuth2ClientPassword.Strategy(function(id, secret, callback){
     ClientRepository.findOneByName(name, function(error, clientSchema){
         if(error){
             return callback(error);
@@ -73,8 +38,8 @@ passport.use("bearer", new BearerStrategy(function(accessToken, callback){
     AccessTokenRepository.findOneByValue(accessToken, function(error, accessTokenSchema){
         if(error){
             return callback(error);
-        }else if(!accessTokenSchema){
-            return callback(error)
+        }else if(!accessTokenSchema) {
+            return callback(error);
         }else{
             UserRepository.findOneById(accessTokenSchema.userId, function(error, userSchema){
                 if(error){
@@ -89,14 +54,17 @@ passport.use("bearer", new BearerStrategy(function(accessToken, callback){
     });
 }));
 
-exports.isLocalAuthenticated = passport.authenticate("local", {
-    //successRedirect: UrlMapping.INDEX[0],
+exports.isLocalAuthenticated = passport.authenticate("local", {    
     failureRedirect: UrlMapping.SIGN_IN,
     failureFlash: true
 });
-//exports.isHttpAuthenticated = passport.authenticate("http", { session: false });
+exports.isHttpAuthenticated = passport.authenticate("http", { session: false });
 //exports.isClientAuthenticated = passport.authenticate("client-basic", { session: false });
 //exports.isBearerAuthenticated = passport.authenticate("bearer", { session: false });
+
+exports.hasAuthority = function(req, res, next) {
+    next();
+}
 
 exports.getSignIn = function(req, res){
     res.render("auth/login", { title: "Welcome back!" });
@@ -107,7 +75,7 @@ exports.getSignUp = function(req, res){
 exports.postSignUp = function(req, res){
     var user = new User(req.body.email, req.body.password, false, false, UserRoles.USER);
     UserRepository.save(user);
-    res.send(200);
+    res.sendStatus(200);
 }
 exports.postSignIn = function (req, res) {
     res.render("index", {
@@ -118,4 +86,25 @@ exports.postSignIn = function (req, res) {
 exports.getSignOut = function(req, res) {
     req.logout();
     res.redirect("/");
+}
+
+/*
+ * internal functions
+ */
+function verifyCredentials(username, password, callback) {
+    UserRepository.findOneByEmail(email, function (error, userSchema) {
+        if (!userSchema) {
+            return callback(null, false);
+        } else {
+            UserSchema.methods.verifyPassword(userSchema.password, password, function (error, isMatch) {
+                if (error) {
+                    return callback(error);
+                } else if (!isMatch) {
+                    return callback(null, false);
+                } else {
+                    return callback(null, UserSchema.methods.toUser(userSchema));
+                }
+            });
+        }
+    });
 }

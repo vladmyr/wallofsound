@@ -5,20 +5,20 @@ exports.postClients = function(req, res){
     client.setSecret(req.body.secret);
     client.setUserId(req.user.getId());
 
-    ClientRepository.save(client, function(error){
-        if(error){
+    ClientRepository.save(client, function(error) {
+        if (error) {
             res.send(error)
-        }else{
+        } else {
             res.json({ message: "client added!", data: client.toString() });
         }
-    })
+    });
 }
-exports.getClients = function(req, res){
-    ClientRepository.findByUserId(req.user.getId(), function(error, arrClientSchema){
-        if(error){
+exports.getClients = function(req, res) {
+    ClientRepository.findByUserId(req.user.getId(), function(error, arrClientSchema) {
+        if (error) {
             res.send(error);
-        }else{
+        } else {
             res.json(arrClientSchema);
         }
-    })
+    });
 }

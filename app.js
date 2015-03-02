@@ -16,7 +16,8 @@ bcrypt = require("bcrypt-nodejs");
 passport = require("passport");
 passportLocal = require("passport-local");
 passportHttp = require("passport-http");
-BearerStrategy = require("passport-http-bearer").Strategy;
+passportHttpBearer = require("passport-http-bearer");
+passportOAuth2ClientPassword = require("passport-oauth2-client-password");
 OAuth2orize = require("oauth2orize");
 RedirectStrategy = require("./config/RedirectStrategy.js");
 
@@ -36,6 +37,7 @@ var helmet = require("helmet");
 //var partials = require("hogan-express-partials");
 
 var router = express.Router();
+var rest = express.Router();
 
 /* schemas */
 require("./data/models/UserModel");
@@ -60,6 +62,7 @@ var indexController = require("./routes/IndexController");
 var clientController = require("./routes/ClientController");
 var authController = require("./routes/AuthController");
 //var oAuth2Controller = require("./routes/OAuth2Controller");
+var fileRestController = require("./routes/rest/FileRestController");
 
 /*
  * bodyParser configuration
@@ -146,7 +149,12 @@ router.route(UrlMapping.SIGN_OUT)
 router.route(UrlMapping.USER)
     .get(authController.isLocalAuthenticated, function(req, res){
         res.send(200);
-    });
+});
+rest.route(UrlMapping.API + UrlMapping.REST_UPLOAD)
+    .get(function(req, res, next) {
+        authController.isLocalAuthenticated;
+        authController.hasAuthority(req, res, next, UserRoles.SUPERUSER);
+    }, fileRestController.getUploadFile);
 //router.route("/clients")
 //    .get(authController.isHttpAuthenticated, clientController.getClients)
 //    .post(authController.isHttpAuthenticated, clientController.postClients);
@@ -157,6 +165,7 @@ router.route(UrlMapping.USER)
 //    .post(authController.isClientAuthenticated, oAuth2Controller.token);
 
 app.use("/", router);
+app.use(UrlMapping.API, authController.isHttpAuthenticated);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
