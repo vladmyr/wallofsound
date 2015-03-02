@@ -11,14 +11,13 @@ UserRepository = (function(){
             UserModel.findOne({ email: email }, callback);
         },
         save: function(user, callback){
-//            var userId = mongoose.Types.ObjectId();
             new UserModel({
                 _id: mongoose.Types.ObjectId(),
-                email: user.getEmail(),
-                password: user.getPassword(),
-                isBlocked: user.getBlocked(),
-                isLocked: user.getLocked(),
-                userRole: user.getUserRole()
+                email: user.email,
+                password: user.password,
+                isBlocked: user.blocked,
+                isLocked: user.locked,
+                userRole: user.userRole
             }).save(callback);
         },
         update: function(user, callback){
@@ -26,25 +25,13 @@ UserRepository = (function(){
                 _id: user.getId()
             },{
                 $set: {
-                    email: user.getEmail(),
-                    password: user.getPassword(),
-                    isBlocked: user.getBlocked(),
-                    isLocked: user.getLocked(),
-                    userRole: user.getUserRole()
+                    email: user.email,
+                    password: user.password,
+                    isBlocked: user.isBlocked,
+                    isLocked: user.isLocked,
+                    userRole: user.userRole
                 }
             }, callback);
-//            this.findById(function(error, user){
-//                //ToDo add error handling
-//                user.email = updatedUser.getEmail();
-//                user.password = updatedUser.getPassword();
-//                user.isBlocked = updatedUser.getBlocked();
-//                user.isLocked = updatedUser.getLocked();
-//                user.userRole = updatedUser.getUserRole();
-//
-//                this.save(function(error){
-//
-//                });
-//            });
         },
         remove: function(id, callback){
             UserModel.findByIdAndRemove(id, callback);

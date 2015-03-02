@@ -7,10 +7,10 @@ UserSchema = new mongoose.Schema({
     userRole: { type: Number, required: true }
 });
 UserSchema.methods.hashPassword = function(password, callback){
-    bcrypt.genSalt(5, function(err, salt){
-        if(err) return callback(err);
-        bcrypt.hash(password, salt, null, function(err, hash){
-            if(err) return callback(err);
+    bcrypt.genSalt(5, function(error, salt){
+        if(error) return callback(error);
+        bcrypt.hash(password, salt, null, function(error, hash){
+            if(error) return callback(error);
             callback(err, hash);
         });
     });
@@ -23,34 +23,21 @@ UserSchema.methods.verifyPassword = function(userSchemaPassword, password, callb
 
 }
 UserSchema.methods.toUser = function(userSchema){
-    var user = new User();
-    user.setId(userSchema._id);
-    user.setEmail(userSchema.email);
-    user.setBlocked(userSchema.isBlocked);
-    user.setLocked(userSchema.isLocked);
-    user.setUserRole(userSchema.userRole);
-    return user;
+    return new User(userSchema._id, userSchema.email, userSchema.isBlocked, userSchema.isLocked, userSchema.userRole);
 }
 UserSchema.pre("save", function(callback){
     var userSchema = this;
     if(!userSchema.isModified("password")) return callback();
 
-    this.hashPassword(userSchema.password, function(error, hash){
-        if(!error) userSchema.password = hash;
+    this.hashPassword(userSchema.password, function(error, hash) {
+        if (!error) userSchema.password = hash;
         callback();
-    })
+    });
 });
-//UserSchema.pre("update", function(callback){
-//    var userSchema = this;
-//    if(!userSchema.isModified("password")) return callback();
-//
-//    this.hashPassword(userSchema.password, function(error, hash){
-//        if(!error) userSchema.password = hash;
-//        callback();
-//    })
-//});
 
 UserModel = mongoose.model("user", UserSchema);
+
+//ToDo: add validation
 UserModel.schema.path("password").validate(function(value){
 //    return /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(value);
     return true;

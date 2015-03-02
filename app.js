@@ -33,7 +33,7 @@ var cookieParser = require('cookie-parser'); //store session ID in browser
 var bodyParser = require('body-parser'); //read credentials form request bodies
 var session = require("express-session"); //server-side storage of user IDs
 var helmet = require("helmet");
-var partials = require("hogan-express-partials");
+//var partials = require("hogan-express-partials");
 
 var router = express.Router();
 
@@ -102,7 +102,6 @@ app.set("views", path.join(__dirname, "views")); //set view base directory
 app.set("view engine", "html"); //view file extencion
 app.set("layout", "layout/default"); //page layout template
 app.engine("html", require("hogan-express")); //set template engine
-app.use(partials.middleware()); //enable the ability to use of extenmal templates
 
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
@@ -138,7 +137,7 @@ router.route(UrlMapping.INDEX)
     .get(indexController.getIndex);
 router.route(UrlMapping.SIGN_IN)
     .get(authController.getSignIn)
-    .post(authController.postSignIn);
+    .post(authController.isLocalAuthenticated, authController.postSignIn);
 router.route(UrlMapping.SIGN_UP)
     .get(authController.getSignUp)
     .post(authController.postSignUp);
@@ -215,7 +214,7 @@ function normalizePort(val) {
 
 //Event listener for HTTP server "error" event.
 function onError(error) {
-    if (error.syscall !== '55listen') {
+    if (error.syscall !== 'listen') {
         throw error;
     }
 

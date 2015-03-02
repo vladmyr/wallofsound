@@ -14,6 +14,7 @@
     "express": "~4.12.0",
     "express-session": "^1.10.3",
     "helmet": "^0.6.1",
+    "hogan-express": "^0.5.2",
     "mongoose": "^3.8.24",
     "morgan": "~1.5.1",
     "oauth2orize": "^1.0.1",

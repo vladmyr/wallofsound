@@ -1,3 +1,6 @@
 <h1>{{ title }}</h1>
 <p>Welcome to {{ title }}</p>
-<p>{{_csrf}}</p>
+<p>Your csrf token is {{_csrf}}</p>
+{{#isAuthenticated}}
+<p>You are now logged as {{user.email}}</p>
+{{/isAuthenticated}}

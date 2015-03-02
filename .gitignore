@@ -4,3 +4,5 @@
 *.dat
 *.sln
 obj/Debug/wallofsound011.njsproj.FileListAbsolute.txt
+node_modules/
+*.tmp

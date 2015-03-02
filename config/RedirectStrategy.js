@@ -1,3 +1,5 @@
-﻿exports = function (req) {
-    return UrlMapping.INDEX;
+﻿exports = function (req, res) {
+    res.render("index", {
+        isAuthenticated: req.isAuthenticated()
+    });
 };

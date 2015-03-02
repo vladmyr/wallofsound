@@ -1,6 +1,6 @@
 //in order to save some traffic return only unique user id
 passport.serializeUser(function (user, callback) {
-    callback(user.getId);
+    callback(null, user.id);
 });
 
 //deserialize by quering a user from database by id
@@ -11,7 +11,7 @@ passport.deserializeUser(function (id, callback) {
         } else if (!userSchema) {
             return callback(null, false);
         } else {
-            return callback(UserSchema.methods.toUser(userSchema));
+            return callback(null, UserSchema.methods.toUser(userSchema));
         }
     });
 });
@@ -89,7 +89,11 @@ passport.use("bearer", new BearerStrategy(function(accessToken, callback){
     });
 }));
 
-exports.isLocalAuthenticated = passport.authenticate("local");
+exports.isLocalAuthenticated = passport.authenticate("local", {
+    //successRedirect: UrlMapping.INDEX[0],
+    failureRedirect: UrlMapping.SIGN_IN,
+    failureFlash: true
+});
 //exports.isHttpAuthenticated = passport.authenticate("http", { session: false });
 //exports.isClientAuthenticated = passport.authenticate("client-basic", { session: false });
 //exports.isBearerAuthenticated = passport.authenticate("bearer", { session: false });
@@ -101,21 +105,17 @@ exports.getSignUp = function(req, res){
     res.render("auth/join", { title: "Join WallOfSound" });
 }
 exports.postSignUp = function(req, res){
-    var user = new User();
-    user.setEmail(req.body.email);
-    user.setPassword(req.body.password);
-    user.setBlocked(false);
-    user.setLocked(false);
-    user.setUserRole(UserRoles.USER);
-
+    var user = new User(req.body.email, req.body.password, false, false, UserRoles.USER);
     UserRepository.save(user);
-
     res.send(200);
 }
-exports.postSignIn = function(req, res) {
-    res.json("login action was performed successfully");
+exports.postSignIn = function (req, res) {
+    res.render("index", {
+        isAuthenticated: req.isAuthenticated(),
+        user: req.user
+    });
 }
 exports.getSignOut = function(req, res) {
     req.logout();
-    res.redirect(RedirectStrategy(req));
+    res.redirect("/");
 }
