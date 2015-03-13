@@ -10,7 +10,7 @@ UserSchema.methods.hashPassword = function (password, callback){
     //execute encryption 5 times in a loop to generate salt
     bcrypt.genSalt(5, function(error, salt){
         if (error) return callback(error);
-        //hash password with salt
+        //hash password with sal
         bcrypt.hash(password, salt, null, function(error, hash){
             if(error) return callback(error);
             callback(err, hash);

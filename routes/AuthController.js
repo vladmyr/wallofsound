@@ -34,7 +34,7 @@ passport.use("client", new passportOAuth2ClientPassword.Strategy(function(id, se
     });
 }));
 
-passport.use("bearer", new BearerStrategy(function(accessToken, callback){
+passport.use("bearer", new passportHttpBearer.Strategy(function(accessToken, callback){
     AccessTokenRepository.findOneByValue(accessToken, function(error, accessTokenSchema){
         if(error){
             return callback(error);
@@ -78,10 +78,11 @@ exports.postSignUp = function(req, res){
     res.sendStatus(200);
 }
 exports.postSignIn = function (req, res) {
-    res.render("index", {
-        isAuthenticated: req.isAuthenticated(),
-        user: req.user
-    });
+    res.redirect("/");
+    //res.render("index", {
+    //    isAuthenticated: req.isAuthenticated(),
+    //    user: req.user
+    //});
 }
 exports.getSignOut = function(req, res) {
     req.logout();
@@ -92,7 +93,7 @@ exports.getSignOut = function(req, res) {
  * internal functions
  */
 function verifyCredentials(username, password, callback) {
-    UserRepository.findOneByEmail(email, function (error, userSchema) {
+    UserRepository.findOneByEmail(username, function (error, userSchema) {
         if (!userSchema) {
             return callback(null, false);
         } else {

@@ -3,9 +3,27 @@ html
     min-height: 100%
     height: 1px
 .relative
-    position: relative;
+    position: relative
+.brand-fixed
+	position: fixed
+	width: 136px
+.brand-fixed-offset
+	padding-left: 136px
+.settings-offset-right
+	padding-right: 124px
+.settings
+	width: 104px
+	position: fixed
+	right: 0
+	.dropdown-menu>li>a
+		&:hover,:focus
+			color: #fff
+			background-image: -webkit-linear-gradient(top,#656d78 0,#656d78 100%)
+			background-image: -o-linear-gradient(top,#656d78 0,#656d78 100%)
+			background-image: -webkit-gradient(linear,left top,left bottom,from(#656d78),to(#656d78))
+			background-image: linear-gradient(to bottom,#656d78 0,#656d78 100%)
 .fixed-top-offset
-    padding-top: 50px;
+    padding-top: 50px
 .icon-bar
     display: block
     width: 22px
@@ -14,7 +32,7 @@ html
 .icon-bar + .icon-bar
     margin-top: 4px
 .navbar-custom .icon-bar
-    background-color: #434A54;
+    background-color: #434A54
 .navbar-custom .navbar-toggle
     display: block;
     &:hover
@@ -38,3 +56,47 @@ html
     color: #F6F6F7
     &.glyphicon-xl
         font-size: 200px
+.glyphicon
+	&.glyphicon-xs
+		font-size: 10px
+.player
+	.player-controls
+		float: left
+		padding-top: 15px
+		padding-bottom: 15px
+		&>a
+			padding-left: 5px
+			padding-right: 5px
+			&:hover
+				cursor: pointer
+	.player-playing
+		padding-left: 15px
+		padding-top: 7px
+		padding-bottom: 7px
+		float: left
+		p
+			margin: 0
+			font-weight: bold;
+		.progress
+			margin-top: 8px
+			margin-bottom: 0
+			height: 8px
+	.player-album-cover
+		width: 36px
+		height: 36px
+		margin-top: 7px
+		margin-bottom: 7px
+		margin-left: 12px
+		background-color: #ccc
+	.player-fixed-1
+		position: fixed
+		width: 128px
+		z-index: 1
+	.player-fixed-1-offset
+		padding-left: 158px
+.progress-bar-playing
+	background-color: #434A54
+	background-image: -webkit-linear-gradient(top,#434A54 0,#434A54 100%);
+	background-image: -o-linear-gradient(top,#434A54 0,#434A54 100%);
+	background-image: -webkit-gradient(linear,left top,left bottom,from(#434A54),to(#434A54));
+	background-image: linear-gradient(to bottom,#434A54 0,#434A54 100%);

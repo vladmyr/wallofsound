@@ -6,8 +6,7 @@ require("./config/MongoConfig");
 require("./domain/enum/UserRoleEnum");
 require("./domain/User");
 require("./domain/Client");
-require("./domain/OAuth2Code");
-require("./domain/AccessToken");
+require("./domain/Token");
 
 /* global vars */
 fs = require("fs");
@@ -20,6 +19,8 @@ passportHttpBearer = require("passport-http-bearer");
 passportOAuth2ClientPassword = require("passport-oauth2-client-password");
 OAuth2orize = require("oauth2orize");
 RedirectStrategy = require("./config/RedirectStrategy.js");
+
+Model = require("./middleware/Model");
 
 var http = require('http');
 var debug = require('debug')('wallofsound01:server');
@@ -37,19 +38,18 @@ var helmet = require("helmet");
 //var partials = require("hogan-express-partials");
 
 var router = express.Router();
+var libraryRouter = express.Router();
 var rest = express.Router();
 
 /* schemas */
 require("./data/models/UserModel");
 require("./data/models/ClientModel");
 require("./data/models/AccessTokenModel");
-require("./data/models/OAuth2CodeModel");
 
 /* repositories */
 require("./data/repositories/UserRepository");
 require("./data/repositories/ClientRepository");
 require("./data/repositories/AccessTokenRepository");
-require("./data/repositories/OAuth2CodeRepository");
 
 /* db initializer */
 require("./data/initializers/DatabaseInitializer");
@@ -62,6 +62,7 @@ var indexController = require("./routes/IndexController");
 var clientController = require("./routes/ClientController");
 var authController = require("./routes/AuthController");
 //var oAuth2Controller = require("./routes/OAuth2Controller");
+var libraryController = require("./routes/LibraryController.js");
 var fileRestController = require("./routes/rest/FileRestController");
 
 /*
@@ -92,6 +93,10 @@ app.use(csurf()); //requires session inititialization first
 app.use(function (req, res, next) {
     res.locals.session = req.session;
     res.locals._csrf = req.csrfToken();
+    //if (req.isAuthenticated()) {
+    //    res.isAuthenticated = req.isAuthenticated();
+    //    res.user = req.user;
+    //}
     next();
 });
 
@@ -136,7 +141,7 @@ db.connection.once("open", function(){
 });
 
 //set route mapping
-router.route(UrlMapping.INDEX)
+router.route([UrlMapping.INDEX, UrlMapping.DASH, UrlMapping.HOME])
     .get(indexController.getIndex);
 router.route(UrlMapping.SIGN_IN)
     .get(authController.getSignIn)
@@ -150,6 +155,10 @@ router.route(UrlMapping.USER)
     .get(authController.isLocalAuthenticated, function(req, res){
         res.send(200);
 });
+
+libraryRouter.route(UrlMapping.LIBRARY_FILE_UPLOAD)
+    .get(libraryController.getFileUpload);
+
 rest.route(UrlMapping.API + UrlMapping.REST_UPLOAD)
     .get(function(req, res, next) {
         authController.isLocalAuthenticated;
@@ -164,7 +173,8 @@ rest.route(UrlMapping.API + UrlMapping.REST_UPLOAD)
 //router.route("/oauth/token")
 //    .post(authController.isClientAuthenticated, oAuth2Controller.token);
 
-app.use("/", router);
+app.use(UrlMapping.DASH, router);
+app.use(UrlMapping.LIBRARY, libraryRouter);
 app.use(UrlMapping.API, authController.isHttpAuthenticated);
 
 // catch 404 and forward to error handler
