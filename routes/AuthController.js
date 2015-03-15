@@ -54,10 +54,24 @@ passport.use("bearer", new passportHttpBearer.Strategy(function(accessToken, cal
     });
 }));
 
-exports.isLocalAuthenticated = passport.authenticate("local", {    
+//exports.isLocalAuthenticated = function(req, res, next){
+//    passport.authenticate("local", function(error, user, info){
+//        console.log(error, user, info, arguments);
+//        if(!user){
+//            req.flash("hasErrorMessage", true);
+//            req.flash("errorMessage", "Invalid username and password");
+//            res.redirect(UrlMapping.SIGN_IN);
+//        }else{
+//            next();
+//        }
+//    })(req, res, next);
+//}
+
+exports.isLocalAuthenticated = passport.authenticate("local", {
     failureRedirect: UrlMapping.SIGN_IN,
     failureFlash: true
 });
+
 exports.isHttpAuthenticated = passport.authenticate("http", { session: false });
 //exports.isClientAuthenticated = passport.authenticate("client-basic", { session: false });
 //exports.isBearerAuthenticated = passport.authenticate("bearer", { session: false });

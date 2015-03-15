@@ -1,4 +1,5 @@
 /* config */
+require("./config/AppConfig");
 require("./config/UrlMapping");
 require("./config/MongoConfig");
 
@@ -9,7 +10,11 @@ require("./domain/Client");
 require("./domain/Token");
 
 /* global vars */
+PATH_PROJECT_DIR = __dirname;
+
+_ = require("underscore");
 fs = require("fs");
+path = require('path');
 mongoose = require("mongoose");
 bcrypt = require("bcrypt-nodejs");
 passport = require("passport");
@@ -18,9 +23,10 @@ passportHttp = require("passport-http");
 passportHttpBearer = require("passport-http-bearer");
 passportOAuth2ClientPassword = require("passport-oauth2-client-password");
 OAuth2orize = require("oauth2orize");
-RedirectStrategy = require("./config/RedirectStrategy.js");
+//RedirectStrategy = require("./config/RedirectStrategy.js");
 
 Model = require("./middleware/Model");
+FileManager = require("./middleware/FileManager");
 
 var http = require('http');
 var debug = require('debug')('wallofsound01:server');
@@ -28,7 +34,6 @@ var debug = require('debug')('wallofsound01:server');
 var port = '3000';
 var express = require('express');
 var csurf = require("csurf");
-var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser'); //store session ID in browser
@@ -36,6 +41,7 @@ var bodyParser = require('body-parser'); //read credentials form request bodies
 var busboy = require("connect-busboy"); //middleware for handling multipart/form-data
 //var multer = require("multer");
 var session = require("express-session"); //server-side storage of user IDs
+var flash = require("connect-flash"); //used for managing flash messages
 var helmet = require("helmet");
 //var partials = require("hogan-express-partials");
 
@@ -74,7 +80,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(busboy({
-    immediate: true
+    immediate: true,
+    limits: {
+        fileSize: 50 * 1024 * 1024 * 1024 //max 50mb
+    }
 }));
 
 /*
@@ -87,7 +96,7 @@ app.use(session({
     saveUninitialized: false,
     resave: false,
     cookie: {
-        secure: false //in production this should be set to true
+        secure: true //in production this should be set to true
     }
 }));
 
@@ -101,6 +110,8 @@ app.use(passport.session()); //tell passport to use sessions
 //    res.locals._csrf = req.csrfToken();
 //    next();
 //});
+
+app.use(flash());
 
 app.set('port', port);
 app.set("env", "development");

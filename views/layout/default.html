@@ -65,6 +65,13 @@
         </div>
     </nav>
     <div class="container fixed-top-offset">
+        <!-- flash error message -->
+        <!--{{#hasErrorMessage}}-->
+            <!--<div class="alert alert-danger">-->
+                <!--<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>-->
+                <!--{{errorMessage}}-->
+            <!--</div>-->
+        <!--{{/hasErrorMessage}}-->
         {{{ yield }}}
     </div>
     <footer></footer>
