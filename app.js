@@ -33,13 +33,15 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser'); //store session ID in browser
 var bodyParser = require('body-parser'); //read credentials form request bodies
+var busboy = require("connect-busboy"); //middleware for handling multipart/form-data
+//var multer = require("multer");
 var session = require("express-session"); //server-side storage of user IDs
 var helmet = require("helmet");
 //var partials = require("hogan-express-partials");
 
 var router = express.Router();
 var libraryRouter = express.Router();
-var rest = express.Router();
+var restRouter = express.Router();
 
 /* schemas */
 require("./data/models/UserModel");
@@ -71,6 +73,10 @@ var fileRestController = require("./routes/rest/FileRestController");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(busboy({
+    immediate: true
+}));
+
 /*
  * Security settings
  */
@@ -89,16 +95,12 @@ app.use(passport.initialize()); //passport middleware initialization
 app.use(passport.session()); //tell passport to use sessions
 //app.use(helmet());
 
-app.use(csurf()); //requires session inititialization first
-app.use(function (req, res, next) {
-    res.locals.session = req.session;
-    res.locals._csrf = req.csrfToken();
-    //if (req.isAuthenticated()) {
-    //    res.isAuthenticated = req.isAuthenticated();
-    //    res.user = req.user;
-    //}
-    next();
-});
+//app.use(csurf()); //requires session inititialization first
+//app.use(function (req, res, next) {
+//    res.locals.session = req.session;
+//    res.locals._csrf = req.csrfToken();
+//    next();
+//});
 
 app.set('port', port);
 app.set("env", "development");
@@ -159,11 +161,14 @@ router.route(UrlMapping.USER)
 libraryRouter.route(UrlMapping.LIBRARY_FILE_UPLOAD)
     .get(libraryController.getFileUpload);
 
-rest.route(UrlMapping.API + UrlMapping.REST_UPLOAD)
-    .get(function(req, res, next) {
-        authController.isLocalAuthenticated;
-        authController.hasAuthority(req, res, next, UserRoles.SUPERUSER);
-    }, fileRestController.getUploadFile);
+restRouter.route(UrlMapping.FILE_UPLOAD)
+    .get(fileRestController.getUploadFile)
+    .post(fileRestController.postUploadFile);
+//restRouter.route(UrlMapping.API + UrlMapping.REST_UPLOAD)
+//    .get(function(req, res, next) {
+//        authController.isLocalAuthenticated;
+//        authController.hasAuthority(req, res, next, UserRoles.SUPERUSER);
+//    }, fileRestController.getUploadFile);
 //router.route("/clients")
 //    .get(authController.isHttpAuthenticated, clientController.getClients)
 //    .post(authController.isHttpAuthenticated, clientController.postClients);
@@ -175,7 +180,7 @@ rest.route(UrlMapping.API + UrlMapping.REST_UPLOAD)
 
 app.use(UrlMapping.DASH, router);
 app.use(UrlMapping.LIBRARY, libraryRouter);
-app.use(UrlMapping.API, authController.isHttpAuthenticated);
+app.use(UrlMapping.API, restRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

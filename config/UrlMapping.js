@@ -12,6 +12,6 @@ UrlMapping = Object.freeze({
     LIBRARY_FILE_UPLOAD: "/upload",
     
     API: "/api",
-    REST_UPLOAD: "/upload",
+    FILE_UPLOAD: "/upload",
     REST_LIST: "/list"
 });

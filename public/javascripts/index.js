@@ -52,7 +52,23 @@ console.log("index.js");
 //    $.data(this, "scrollTimer", setTimeout(handleScroll, 200));
 //});
 
-var app = angular.module("app", []);
-app.controller("LibraryController", function ($scope) {
+//var app = angular.module("app", ["ngRoute", "angularFileUpload"]);
+var app = angular.module("app", ["ngRoute"]);
+app.factory("FileUploadFactory", function ($http) {
+//    var fileUploadRequest = {
+//        method: "POST",
+//        url: UrlMapping.API + FILE_UPLOAD
+//    }
+//    return {
+//        sendFile: function (multi){
 
+//        }
+//    }
+});
+app.controller("FileUploadController", function ($scope) {
+//    $scope.uploader = new FileUploader();
+    $scope.items = [
+        { name: "name1", value: "value1" }, 
+        { name: "name1", value: "value1" }
+    ];
 });

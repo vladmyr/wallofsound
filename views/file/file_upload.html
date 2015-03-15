@@ -1,3 +1,7 @@
-﻿<div ng-controller="LibraryController">
+﻿<div ng-controller="FileUploadController">
     <h3>File upload</h3>
+    <form action="/api/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file"/>
+        <button type="submit">Send file</button>
+    </form>
 </div>
