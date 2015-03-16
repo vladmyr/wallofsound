@@ -21,6 +21,7 @@
     "mongoose": "^3.8.24",
     "morgan": "~1.5.1",
     "multer": "^0.1.8",
+    "musicmetadata": "^1.0.0",
     "oauth2orize": "^1.0.1",
     "passport": "^0.2.1",
     "passport-http": "^0.2.2",

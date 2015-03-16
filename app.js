@@ -8,6 +8,7 @@ require("./domain/enum/UserRoleEnum");
 require("./domain/User");
 require("./domain/Client");
 require("./domain/Token");
+require("./domain/AudioFile");
 
 /* global vars */
 PATH_PROJECT_DIR = __dirname;
@@ -24,6 +25,7 @@ passportHttpBearer = require("passport-http-bearer");
 passportOAuth2ClientPassword = require("passport-oauth2-client-password");
 OAuth2orize = require("oauth2orize");
 //RedirectStrategy = require("./config/RedirectStrategy.js");
+MusicMetadata = require("musicmetadata");
 
 Model = require("./middleware/Model");
 FileManager = require("./middleware/FileManager");
@@ -53,11 +55,13 @@ var restRouter = express.Router();
 require("./data/models/UserModel");
 require("./data/models/ClientModel");
 require("./data/models/AccessTokenModel");
+require("./data/models/AudioFileModel");
 
 /* repositories */
 require("./data/repositories/UserRepository");
 require("./data/repositories/ClientRepository");
 require("./data/repositories/AccessTokenRepository");
+require("./data/repositories/AudioFileRepository");
 
 /* db initializer */
 require("./data/initializers/DatabaseInitializer");

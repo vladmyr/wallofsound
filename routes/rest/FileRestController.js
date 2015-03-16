@@ -14,13 +14,31 @@ exports.postUploadFile = function (req, res) {
             if(filename === ""){
                 res.status(400).send("File was not found");
             }else if(_.contains(["audio/mp3", "audio/mpeg"], mimetype)){
-                //save *.mp3 in fs
-                FileManager.saveFile(path.join(PATH_PROJECT_DIR, AppConfig.PATH_FILE_UPLOAD_TMP), file, filename, function(error){
-                    if(error){
-                        res.send(500, error.message);
-                    }else{
-                        res.send(200);
-                    }
+                //extract file matadata
+                MusicMetadata(file, function(err, metadata){
+                    var audioFile = new AudioFile();
+                    metadata.artist.length > 0 && (audioFile.artist = metadata.artist[0]); //ToDo: extract all artists
+                    metadata.title !== "" && (audioFile.title = metadata.title);
+                    metadata.album !== "" && (audioFile.album = metadata.album);
+                    metadata.year !== "" && (audioFile.year = +metadata.year);
+                    metadata.track !== {} && typeof metadata.track.no !== "undefined" && (audioFile.trackNo = metadata.track.no);
+                    //save *.mp3 in fs
+                    var audioFilePath = path.join(PATH_PROJECT_DIR, AppConfig.PATH_FILE_UPLOAD_TMP);
+                    FileManager.saveFile(audioFilePath, file, filename, function(error){
+                        if(error){
+                            res.status(500).send(error.message);
+                        }else{
+                            audioFile.userId = 0;
+                            audioFile.path = path.join(audioFilePath, filename);
+                            AudioFileRepository.save(audioFile, function(error){
+                                if(error){
+                                    res.status(500).send(error.message);
+                                }else{
+                                    res.sendStatus(200);
+                                }
+                            });
+                        }
+                    });
                 });
             }else{
                 /* Very strange behavior. According to comments from multipart.js:

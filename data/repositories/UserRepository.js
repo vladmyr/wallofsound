@@ -22,7 +22,7 @@ UserRepository = (function(){
         },
         update: function(user, callback){
             new UserModel.update({
-                _id: user.getId()
+                _id: user.id
             },{
                 $set: {
                     email: user.email,

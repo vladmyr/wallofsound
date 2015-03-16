@@ -87,9 +87,14 @@ exports.getSignUp = function(req, res){
     res.render("auth/join", { title: "Join WallOfSound" });
 }
 exports.postSignUp = function(req, res){
-    var user = new User(req.body.email, req.body.password, false, false, UserRoles.USER);
-    UserRepository.save(user);
-    res.sendStatus(200);
+    var user = new User(0, req.body.email, req.body.password, false, false, UserRoles.USER);
+    UserRepository.save(user, function(error){
+        if(error){
+            res.status(500).send(error.message);
+        }else{
+            res.sendStatus(200);
+        }
+    });
 }
 exports.postSignIn = function (req, res) {
     res.redirect("/");
