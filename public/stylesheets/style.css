@@ -17,12 +17,11 @@ html {
   padding-right: 124px;
 }
 .settings {
-/*width: 104px*/
   position: fixed;
   right: 0;
 }
 .settings .dropdown-menu>li>a:hover,
-.settings .dropdown-menu>li>a :focus {
+.settings .dropdown-menu>li>a:focus {
   color: #fff;
   background-image: -webkit-linear-gradient(top, #656d78 0, #656d78 100%);
   background-image: -o-linear-gradient(top, #656d78 0, #656d78 100%);

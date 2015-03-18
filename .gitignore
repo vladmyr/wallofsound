@@ -1,9 +1,0 @@
-*.iml
-.idea/
-*.njsproj
-*.dat
-*.sln
-obj/Debug/wallofsound011.njsproj.FileListAbsolute.txt
-node_modules/
-*.tmp
-bower_components/

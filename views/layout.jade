@@ -1,0 +1,38 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    title #{title} | WallOfSound
+    link(rel="stylesheet", href="/vendor/bootstrap/css/bootstrap.min.css")
+    link(rel="stylesheet", href="/vendor/bootstrap/css/bootstrap-theme.min.css")
+    link(rel="stylesheet", href="/vendor/bootflat/css/bootflat.min.css")
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    nav.navbar.navbar-custom.navbarfixed-top
+      .row.col-xs-12
+        .brand-fixed
+          ul.nav.navbar-nav
+            li
+              a(class="navbar-brand", href="/") WallOfSound
+        .settings
+          ul.nav.navbar-nav.navbar-right
+            if isAuthenticated
+              li #[a(href="#") #[span.glyphicon.glyphicon-user.glyphicon-xs] #{user.email}]
+            else
+              li #[a(href="/login") Sign in]
+            li
+              button(type="button", class="navbar-toggle dropdown-toggle", data-toggle="dropdown")
+                span.icon-bar
+                span.icon-bar
+                span.icon-bar
+              ul.dropdown-menu
+                li.dropdown-header Menu
+                li.divider
+                li
+                  a(href="#") Link 1
+                  a(href="#") Link 2
+                li.divider
+                li
+                  a(href="#") Link 3
+    div.container.fixed-top-offset
+      block content

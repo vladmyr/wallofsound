@@ -1,130 +1,116 @@
-//in order to save some traffic return only unique user id
-passport.serializeUser(function (user, callback) {
+"use strict";
+
+var models = require("../models");
+var services = require("../services");
+var AuthController = {};
+
+//initialize authentication strategies
+AuthController.initStrategies = function(passport, passportLocal){
+  passport.serializeUser(function(user, callback){
     callback(null, user.id);
-});
+  });
+  passport.deserializeUser(function(id, callback){
+    findById(id, callback);
+  });
 
-//deserialize by quering a user from database by id
-passport.deserializeUser(function (id, callback) {
-    UserRepository.findOneById(id, function (error, userSchema) {
-        if (error) {
-            return callback(error);
-        } else if (!userSchema) {
-            return callback(null, false);
-        } else {
-            return callback(null, UserSchema.methods.toUser(userSchema));
-        }
-    });
-});
+  passport.use("local", new passportLocal.Strategy(verifyCredentials));
 
-/* 
- * strategies 
- */
-passport.use("local", new passportLocal.Strategy(verifyCredentials)); //local authorization using session and cookies
-passport.use("http", new passportHttp.BasicStrategy(verifyCredentials)); //http authorization for web services
-
-passport.use("client", new passportOAuth2ClientPassword.Strategy(function(id, secret, callback){
-    ClientRepository.findOneByName(name, function(error, clientSchema){
-        if(error){
-            return callback(error);
-        }else if(!clientSchema || clientSchema.secret !== secret){
-            return callback(null, false);
-        }else {
-            return callback(null, ClientSchema.methods.toClient(clientSchema));
-        }
-    });
-}));
-
-passport.use("bearer", new passportHttpBearer.Strategy(function(accessToken, callback){
-    AccessTokenRepository.findOneByValue(accessToken, function(error, accessTokenSchema){
-        if(error){
-            return callback(error);
-        }else if(!accessTokenSchema) {
-            return callback(error);
-        }else{
-            UserRepository.findOneById(accessTokenSchema.userId, function(error, userSchema){
-                if(error){
-                    return callback(error);
-                }else if(!userSchema){
-                    return callback(null, false);
-                }else{
-                    return callback(null, UserSchema.methods.toUser(userSchema), { scope: "*" });
-                }
-            });
-        }
-    });
-}));
-
-//exports.isLocalAuthenticated = function(req, res, next){
-//    passport.authenticate("local", function(error, user, info){
-//        console.log(error, user, info, arguments);
-//        if(!user){
-//            req.flash("hasErrorMessage", true);
-//            req.flash("errorMessage", "Invalid username and password");
-//            res.redirect(UrlMapping.SIGN_IN);
-//        }else{
-//            next();
-//        }
-//    })(req, res, next);
-//}
-
-exports.isLocalAuthenticated = passport.authenticate("local", {
-    failureRedirect: UrlMapping.SIGN_IN,
+  AuthController.isLocalAuthenticated = passport.authenticate("local", {
+    failureRedirect: "/login",
     failureFlash: true
-});
-
-exports.isHttpAuthenticated = passport.authenticate("http", { session: false });
-//exports.isClientAuthenticated = passport.authenticate("client-basic", { session: false });
-//exports.isBearerAuthenticated = passport.authenticate("bearer", { session: false });
-
-exports.hasAuthority = function(req, res, next) {
-    next();
+  });
 }
 
-exports.getSignIn = function(req, res){
-    res.render("auth/login", { title: "Welcome back!" });
+AuthController.getSignIn = function(req, res){
+  res.render("auth/login", { title: "Welcome back!" });
 }
-exports.getSignUp = function(req, res){
-    res.render("auth/join", { title: "Join WallOfSound" });
+AuthController.getSignUp = function(req, res){
+  res.render("auth/join", { title: "Join WallOfSound" });
 }
-exports.postSignUp = function(req, res){
-    var user = new User(0, req.body.email, req.body.password, false, false, UserRoles.USER);
-    UserRepository.save(user, function(error){
-        if(error){
-            res.status(500).send(error.message);
-        }else{
-            res.sendStatus(200);
-        }
+AuthController.postSignIn = function(req, res){
+  res.redirect("/");
+}
+AuthController.postSignUp = function(req, res){
+  console.log(req.body);
+  if(typeof req.body.email !== "undefined"
+    && typeof req.body.password !== "undefined"){
+    createUser(req.body.email, req.body.password, function(error, user){
+      if(error){
+        res.status(400).send(error);
+      }else{
+        res.status(200).send(user.get());
+      }
+    })
+  }else{
+    res.status(400).send("Bad request");
+  }
+}
+AuthController.getSignOut = function(req, res){
+  req.logout();
+  res.redirect("/");
+}
+module.exports = AuthController;
+
+/**
+ * verify credentials on sign up
+ * @param email
+ * @param password
+ * @param callback
+ */
+function verifyCredentials(email, password, callback){
+  models.User.find({ where: { email: email }})
+    .on("success", function(user){
+      if(user === null){
+        callback(null, false);
+      }else{
+        services.BCrypt.verifyPassword(password, user.get().password, function(error, isMatch){
+          if(error){
+            callback(error);
+          }else if(!isMatch){
+            callback(null, false);
+          }else{
+            callback(null, user.get());
+          }
+        });
+      }
     });
 }
-exports.postSignIn = function (req, res) {
-    res.redirect("/");
-    //res.render("index", {
-    //    isAuthenticated: req.isAuthenticated(),
-    //    user: req.user
-    //});
-}
-exports.getSignOut = function(req, res) {
-    req.logout();
-    res.redirect("/");
+
+/**
+ * create new user record in database
+ * @param email
+ * @param password
+ * @param callback
+ */
+function createUser(email, password, callback){
+  models.User.find({ where: {email: email }})
+    .on("success", function(user){
+      if(user !== null){ //user with such email is already registered
+        callback("Email is already in use");
+      }else{
+        //hash password
+        services.BCrypt.hashPassword(password, function(error, hash){
+          if(error){
+            callback(error);
+          }else{
+            //create record in database
+            models.User.create({ email: email, password: hash, role: 0 })
+              .then(function(user){
+                callback(null, user);
+              });
+          }
+        });
+      }
+    });
 }
 
-/*
- * internal functions
- */
-function verifyCredentials(username, password, callback) {
-    UserRepository.findOneByEmail(username, function (error, userSchema) {
-        if (!userSchema) {
-            return callback(null, false);
-        } else {
-            UserSchema.methods.verifyPassword(userSchema.password, password, function (error, isMatch) {
-                if (error) {
-                    return callback(error);
-                } else if (!isMatch) {
-                    return callback(null, false);
-                } else {
-                    return callback(null, UserSchema.methods.toUser(userSchema));
-                }
-            });
-        }
+function findById(id, callback){
+  models.User.find(id)
+    .then(function(user){
+      if(!user){
+        callback(null, false);
+      }else{
+        callback(null, user.get());
+      }
     });
 }
