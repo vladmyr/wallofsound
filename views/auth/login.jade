@@ -1,0 +1,18 @@
+extends ../layout
+
+block content
+  h3.text-center #{title}
+  form(action="/login", method="POST", class="contains-background-layer")
+    input(type="hidden", name="_csrf", value="")
+    .form-group
+      label Email
+      input(type="text", class="form-control", name="username", placeholder="you@email.com", required="true")
+    .form-group
+      label Password
+      input(type="password", class="form-control", name="password", placeholder="secret-password", required="true")
+    .form-group
+      p New user? Click here to #[a(href="/join") sign up]!
+    .form-group
+      input(type="submit", class="btn btn-default", value="Join")
+    .background-el.bottom-right
+      span.glyphicon-background.glyphicon.glyphicon-music.glyphicon-xl
