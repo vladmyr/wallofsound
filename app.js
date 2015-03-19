@@ -9,8 +9,12 @@ var bodyParser = require('body-parser');
 var passport = require("passport");
 var passportLocal = require("passport-local");
 var session = require("express-session");
+var formidable = require("formidable");
 var router = express.Router();
 
+//var Upload = require("blueimp-file-upload-expressjs");
+
+var config = require("./config");
 var routes = require('./routes');
 var app = express();
 
@@ -22,7 +26,7 @@ app.set('view engine', 'jade');
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cookieParser());
@@ -38,6 +42,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 routes.AuthController.initStrategies(passport, passportLocal);
+routes.LibraryController.initFormidable(formidable, config.FileUploadConfig.audio);
 
 //routing
 router.route("/")
@@ -50,6 +55,8 @@ router.route("/join")
   .post(routes.AuthController.postSignUp);
 router.route("/logout")
   .get(routes.AuthController.getSignOut);
+router.route("/library/upload")
+  .post(routes.LibraryController.postUpload);
 
 app.use('/', router);
 //app.use('/users', users);
