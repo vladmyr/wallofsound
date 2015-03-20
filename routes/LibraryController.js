@@ -15,20 +15,44 @@ LibraryController.setMusicMetadata = function(musicMetaData){
   LibraryController.musicMataData = musicMetaData;
 }
 
-LibraryController.postUpload = function(req, res){
-  var form = new LibraryController.formidable.IncomingForm();
-  form.multiples = false;
-
-  form.parse(req, function(error, fields, files){
-    console.log(error, fields, files);
-    proceedFile(0, files.file, function(error){
-      if(error){
-        res.status(500).send(error);
-      }else{
-        res.status(200).send();
+LibraryController.getLibrary = function(req, res){
+  if(req.isAuthenticated()){
+    models.AudioFileMeta.findAll({
+      include: [{
+        model: models.Album,
+        include: [{
+          model: models.Artist
+        }]
+      }],
+      where: {
+        UserId: req.user.id
       }
+    }).then(function(rows){
+      res.send(JSON.stringify(rows));
     });
-  });
+  }else{
+    res.send(403).send("You are not authenticated");
+  }
+}
+
+LibraryController.postUpload = function(req, res){
+  if(req.isAuthenticated()){
+    var form = new LibraryController.formidable.IncomingForm();
+    form.multiples = false;
+
+    form.parse(req, function(error, fields, files){
+      //ToDo: add file validation
+      proceedFile(req.user.id, files.file, function(error){
+        if(error){
+          res.status(500).send(error);
+        }else{
+          res.status(200).send();
+        }
+      });
+    });
+  }else{
+    res.status(403).send("You are not authenticated");
+  }
 }
 
 module.exports = LibraryController;
@@ -56,6 +80,7 @@ function proceedFile(userId, file, callback){
           //save to DB
           //ToDo: add validation
           models.AudioFileMeta.create({
+            UserId: userId,
             title: metadata.title !== "" ? metadata.title : file.name,
             trackNo: 0,
             duration: 0,

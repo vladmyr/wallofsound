@@ -34,7 +34,7 @@ app.use(cookieParser());
 app.use(session({
   secret: "secret",
   saveUninitialized: false,
-  resave: false,
+  resave: true,
   cookie: {
     secure: false
   }
@@ -51,12 +51,14 @@ router.route("/")
   .get(routes.HomeController.getIndex);
 router.route("/login")
   .get(routes.AuthController.getSignIn)
-  .post(routes.AuthController.isLocalAuthenticated, routes.AuthController.postSignIn);
+  .post(routes.AuthController.authenticateLocal, routes.AuthController.postSignIn);
 router.route("/join")
   .get(routes.AuthController.getSignUp)
   .post(routes.AuthController.postSignUp);
 router.route("/logout")
   .get(routes.AuthController.getSignOut);
+router.route("/library")
+  .get(routes.AuthController.isLocalAuthenticated, routes.LibraryController.getLibrary);
 router.route("/library/upload")
   .get(routes.AuthController.isLocalAuthenticated, routes.HomeController.getIndex)
   .post(routes.LibraryController.postUpload);
