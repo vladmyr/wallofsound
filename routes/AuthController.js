@@ -17,7 +17,7 @@ AuthController.initStrategies = function(passport, passportLocal){
 
   AuthController.isLocalAuthenticated = passport.authenticate("local", {
     failureRedirect: "/login",
-    failureFlash: true
+    failureFlash: false
   });
 }
 
@@ -34,11 +34,11 @@ AuthController.postSignUp = function(req, res){
   console.log(req.body);
   if(typeof req.body.email !== "undefined"
     && typeof req.body.password !== "undefined"){
-    createUser(req.body.email, req.body.password, function(error, user){
+    createUser(req.body.email, req.body.password, function(error){
       if(error){
         res.status(400).send(error);
       }else{
-        res.status(200).send(user.get());
+        res.redirect("/");
       }
     })
   }else{

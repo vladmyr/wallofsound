@@ -10,6 +10,7 @@ var passport = require("passport");
 var passportLocal = require("passport-local");
 var session = require("express-session");
 var formidable = require("formidable");
+var musicMetaData = require("musicmetadata");
 var router = express.Router();
 
 //var Upload = require("blueimp-file-upload-expressjs");
@@ -43,6 +44,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 routes.AuthController.initStrategies(passport, passportLocal);
 routes.LibraryController.initFormidable(formidable, config.FileUploadConfig.audio);
+routes.LibraryController.setMusicMetadata(musicMetaData);
 
 //routing
 router.route("/")
@@ -56,6 +58,7 @@ router.route("/join")
 router.route("/logout")
   .get(routes.AuthController.getSignOut);
 router.route("/library/upload")
+  .get(routes.AuthController.isLocalAuthenticated, routes.HomeController.getIndex)
   .post(routes.LibraryController.postUpload);
 
 app.use('/', router);
