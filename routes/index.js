@@ -6,7 +6,7 @@ var controllers = {};
 
 fs.readdirSync(__dirname)
   .filter(function(file){
-    return (file !== "index.js" && (file.indexOf(".") !== 0));
+    return fs.lstatSync(path.join(__dirname,file)).isFile() && (file !== "index.js" && (file.indexOf(".") !== 0));
   })
   .forEach(function(file){
     var controllerName = path.basename(file, path.extname(file));

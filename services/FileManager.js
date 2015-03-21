@@ -1,26 +1,22 @@
 "use strict";
 
-var fs = require("fs");
+var fs = require("fs-extra");
 var path = require("path");
 
 var FileManager = {};
-FileManager.createUploadDir = function(dir, callback){
+FileManager.createDir = function(dir, callback){
+  callback = (typeof callback === "function" ? callback : function(){});
   fs.exists(dir, function(isExist){
     if(isExist){
       callback(null);
     }else{
-      fs.mkdir(dir, function(error){
-        if(error){
-          callback(error);
-        }else{
-          callback(null);
-        }
-      })
+      mkdirParent(dir, callback);
     }
   });
 }
+
 FileManager.saveFileFromReadStream = function(dir, file, filename, callback){
-  this.createUploadDir(dir, function(error){
+  this.createDir(dir, function(error){
     if(error){
       callback(error);
     }else{
@@ -35,4 +31,23 @@ FileManager.saveFileFromReadStream = function(dir, file, filename, callback){
     }
   });
 }
+
+FileManager.rmdir = function(dir, callback){
+  callback = (typeof callback === "function" ? callback : function(){});
+  fs.remove(dir, callback);
+}
+
 module.exports = FileManager;
+
+function mkdirParent(dir, callback){
+  fs.mkdir(dir, function(error){
+    if(error && error.errno === 34){
+      mkdirParent(path.dirname(dir), function(){
+        mkdirParent(dir, callback);
+      });
+    }else{
+      callback(null);
+    }
+  });
+}
+

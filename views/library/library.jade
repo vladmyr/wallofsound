@@ -1,0 +1,11 @@
+extends ../layout
+
+block content
+  div(ng-controller="LibraryController")
+    table.table.table-hover.table-library
+      tbody
+        tr(ng-repeat="item in library")
+          td {{item.title}}
+          td {{item.Album.Artist.name}}
+          td {{item.Album.title}}
+          td {{item.Album.year}}

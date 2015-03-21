@@ -1,5 +1,5 @@
 doctype html
-html
+html(ng-app="app")
   head
     meta(charset="utf-8")
     title #{title} | WallOfSound
@@ -8,14 +8,12 @@ html
     link(rel="stylesheet", href="/vendor/bootflat/css/bootflat.min.css")
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    nav.navbar.navbar-custom.navbarfixed-top
+    nav.navbar.navbar-custom.navbar-fixed-top
       .row.col-xs-12
         .brand-fixed
           ul.nav.navbar-nav
             li
               a(class="navbar-brand", href="/") WallOfSound
-            li
-              a(class="navbar-brand", href="/library") library
         .settings
           ul.nav.navbar-nav.navbar-right
             if isAuthenticated
@@ -27,14 +25,18 @@ html
                 span.icon-bar
                 span.icon-bar
                 span.icon-bar
-              ul.dropdown-menu
-                li.dropdown-header Menu
-                li.divider
+              ul.dropdown-menu.dropdown-menu-custom
                 li
-                  a(href="#") Link 1
-                  a(href="#") Link 2
-                li.divider
+                  a(href="/library") #[span.glyphicon.glyphicon-music.glyphicon-sm.margin-right-sm] My library
+                  a(href="#") #[span.glyphicon.glyphicon-cog.glyphicon-sm.margin-right-sm] Account settings
+                li.divider.divider-sm
                 li
-                  a(href="#") Link 3
+                  a(href="/logout") #[span.glyphicon.glyphicon-off.glyphicon-sm.margin-right-sm] Logout
     div.container.fixed-top-offset
       block content
+    script(type="text/javascript", src="/vendor/jquery/jquery.min.js")
+    script(type="text/javascript", src="/vendor/angularjs/angular.min.js")
+    script(type="text/javascript", src="/vendor/angular-route/angular-route.min.js")
+    script(type="text/javascript", src="/vendor/bootstrap/js/bootstrap.min.js")
+    script(type="text/javascript", src="http://cdn.binaryjs.com/0/binary.js")
+    script(type="text/javascript", src="/javascripts/index.js")

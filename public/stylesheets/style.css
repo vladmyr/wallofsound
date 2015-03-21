@@ -40,6 +40,9 @@ html {
 .icon-bar + .icon-bar {
   margin-top: 4px;
 }
+.dropdown-menu-custom>li>a{
+  padding-right: 40px;
+}
 .navbar-custom .icon-bar {
   background-color: #434a54;
 }
@@ -78,6 +81,12 @@ html {
 }
 .glyphicon.glyphicon-xs {
   font-size: 10px;
+}
+.glyphicon.glyphicon-sm {
+  font-size: 12px;
+}
+.glyphicon.margin-right-sm{
+  margin-right: 4px;
 }
 .player .player-controls {
   float: left;
@@ -128,4 +137,16 @@ html {
   background-image: -o-linear-gradient(top, #434a54 0, #434a54 100%);
   background-image: -webkit-gradient(linear, left top, left bottom, from(#434a54), to(#434a54));
   background-image: linear-gradient(to bottom, #434a54 0, #434a54 100%);
+}
+.divider.divider-xs { margin: 0 }
+.divider.divider-sm { margin: 4px 0 }
+
+.table-library>tbody>tr>td,
+.table-library>tbody>tr>th,
+.table-library>tfoot>tr>td,
+.table-library>tfoot>tr>th,
+.table-library>thead>tr>td,
+.table-library>thead>tr>th{
+  padding: 2px;
+  border-top: 1px solid #efefef;
 }

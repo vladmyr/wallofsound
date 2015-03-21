@@ -9,6 +9,13 @@ var LibraryController = {};
 LibraryController.initFormidable = function(formidable, options){
   LibraryController.formidable = formidable;
   LibraryController.formidableOptions = options;
+  services.FileManager.createDir(options.tmpDir);
+
+  //services.FileManager.createDir(path.join(options.tmpDir,"a","b","c","d"), function(){
+  //  services.FileManager.rmdir(path.join(options.tmpDir, "/*"), function(error){
+  //    console.log(error);
+  //  });
+  //});
 }
 
 LibraryController.setMusicMetadata = function(musicMetaData){
@@ -17,19 +24,10 @@ LibraryController.setMusicMetadata = function(musicMetaData){
 
 LibraryController.getLibrary = function(req, res){
   if(req.isAuthenticated()){
-    models.AudioFileMeta.findAll({
-      include: [{
-        model: models.Album,
-        include: [{
-          model: models.Artist
-        }]
-      }],
-      where: {
-        UserId: req.user.id
-      }
-    }).then(function(rows){
-      res.send(JSON.stringify(rows));
-    });
+    //services.Library.list(req.user.id, function(rows){
+    //  res.send(JSON.stringify(rows));
+    //});
+    res.render("library/library", new services.Model(req));
   }else{
     res.send(403).send("You are not authenticated");
   }
@@ -38,6 +36,7 @@ LibraryController.getLibrary = function(req, res){
 LibraryController.postUpload = function(req, res){
   if(req.isAuthenticated()){
     var form = new LibraryController.formidable.IncomingForm();
+    form.uploadDir = LibraryController.formidableOptions.tmpDir;
     form.multiples = false;
 
     form.parse(req, function(error, fields, files){
@@ -59,7 +58,7 @@ module.exports = LibraryController;
 
 function proceedFile(userId, file, callback){
   var filename = path.basename(file.path) + path.extname(file.name);
-  //obtain metadata
+  //obtain audiofile metadata
   LibraryController.musicMataData(fs.createReadStream(file.path), { duration: true }, function(error, metadata){
     if(error){
       fs.unlink(file.path, function(){
@@ -67,7 +66,8 @@ function proceedFile(userId, file, callback){
       });
     }else{
       //save file
-      services.FileManager.saveFileFromReadStream(path.join(__dirname, "../uploads", userId + ""), fs.createReadStream(file.path), filename, function(error){
+      var uploadDestination = path.join(LibraryController.formidableOptions.uploadParentDir, userId + "");
+      services.FileManager.saveFileFromReadStream(uploadDestination, fs.createReadStream(file.path), filename, function(error){
         fs.unlink(file.path, function(){
           callback(error);
         });
@@ -82,9 +82,9 @@ function proceedFile(userId, file, callback){
           models.AudioFileMeta.create({
             UserId: userId,
             title: metadata.title !== "" ? metadata.title : file.name,
-            trackNo: 0,
+            trackNo: metadata.track && metadata.track.no ? metadata.track.no : 0,
             duration: 0,
-            filePath: path.join(__dirname, "../uploads", userId + "", filename)
+            filePath: path.join(uploadDestination, filename)
           }).then(function(audioFileMeta){
             models.Artist.findOrCreate({ where: { name: metadata.artist[0] }})
               .spread(function(artist){

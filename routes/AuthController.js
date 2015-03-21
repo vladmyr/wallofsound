@@ -15,6 +15,13 @@ AuthController.initStrategies = function(passport, passportLocal){
 
   passport.use("local", new passportLocal.Strategy(verifyCredentials));
 
+  //AuthController.authenticateLocal = (function(req, res, next){
+  //  passport.authenticate("local", function(error, user, info){
+  //    failureRedirect: "/login",
+  //      failureFlash: false
+  //  });
+  //})(req, res, next);
+
   AuthController.authenticateLocal = passport.authenticate("local", {
     failureRedirect: "/login",
     failureFlash: false

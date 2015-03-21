@@ -1,6 +1,7 @@
 PROJECT_ROOT = __dirname;
 
 var express = require('express');
+var binaryjs = require("binaryjs");
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -12,11 +13,9 @@ var session = require("express-session");
 var formidable = require("formidable");
 var musicMetaData = require("musicmetadata");
 var router = express.Router();
-
-//var Upload = require("blueimp-file-upload-expressjs");
-
 var config = require("./config");
 var routes = require('./routes');
+var routesRestV1 = require("./routes/rest/v1");
 var app = express();
 
 // view engine setup
@@ -62,9 +61,10 @@ router.route("/library")
 router.route("/library/upload")
   .get(routes.AuthController.isLocalAuthenticated, routes.HomeController.getIndex)
   .post(routes.LibraryController.postUpload);
+router.route("/api/v1/library/list")
+  .get(routesRestV1.LibraryRestController.getLibrary);
 
 app.use('/', router);
-//app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
