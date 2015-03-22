@@ -7,8 +7,14 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+
 var passport = require("passport");
 var passportLocal = require("passport-local");
+var passportHttp = require("passport-http");
+var passportHttpBearer = require("passport-http-bearer");
+var passportOAuth2ClientPassword = require("passport-oauth2-client-password");
+var oauth2orize = require("oauth2orize");
+
 var session = require("express-session");
 var formidable = require("formidable");
 var musicMetaData = require("musicmetadata");
@@ -41,7 +47,13 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
-routes.AuthController.initStrategies(passport, passportLocal);
+routes.AuthController.initStrategies(
+  passport,
+  passportLocal,
+  passportHttp.BasicStrategy,
+  passportOAuth2ClientPassword.Strategy,
+  passportHttpBearer.Strategy,
+  oauth2orize);
 routes.LibraryController.initFormidable(formidable, config.FileUploadConfig.audio);
 routes.LibraryController.setMusicMetadata(musicMetaData);
 
@@ -63,6 +75,13 @@ router.route("/library/upload")
   .post(routes.LibraryController.postUpload);
 router.route("/api/v1/library/list")
   .get(routesRestV1.LibraryRestController.getLibrary);
+
+router.route("/token")
+  .post(routes.AuthController.token);
+router.route("/api/v1/user")
+  .get(routes.AuthController.authenticateBearer, function(req, res){
+    res.json({ userId: req.user.userId, email: req.user.email, scope: req.authInfo.scope });
+  });
 
 app.use('/', router);
 

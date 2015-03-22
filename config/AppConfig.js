@@ -1,5 +1,10 @@
 var AppConfig = Object.freeze({
-  libraryPageSize: 100
+  general: {
+    libraryPageSize: 100
+  },
+  security: {
+    tokenLife: 3600
+  }
 });
 
 module.exports = AppConfig;

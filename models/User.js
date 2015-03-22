@@ -14,6 +14,8 @@ module.exports = function(sequelize, DataTypes){
       associate: function(models){
         User.hasOne(models.UserSettings);
         User.hasMany(models.AudioFileMeta);
+        User.hasMany(models.AccessToken);
+        User.hasMany(models.RefreshToken);
       }
     }
   });
