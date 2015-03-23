@@ -1,7 +1,6 @@
 PROJECT_ROOT = __dirname;
 
 var express = require('express');
-var binaryjs = require("binaryjs");
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -15,14 +14,19 @@ var passportHttpBearer = require("passport-http-bearer");
 var passportOAuth2ClientPassword = require("passport-oauth2-client-password");
 var oauth2orize = require("oauth2orize");
 
+var io = require("socket.io")();
+
 var session = require("express-session");
 var formidable = require("formidable");
 var musicMetaData = require("musicmetadata");
 var router = express.Router();
 var config = require("./config");
+var services = require("./services");
 var routes = require('./routes');
 var routesRestV1 = require("./routes/rest/v1");
 var app = express();
+
+app.io = io;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -47,13 +51,21 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
-routes.AuthController.initStrategies(
+
+services.Authentication.init(
   passport,
   passportLocal,
   passportHttp.BasicStrategy,
   passportOAuth2ClientPassword.Strategy,
   passportHttpBearer.Strategy,
   oauth2orize);
+//routes.AuthController.initStrategies(
+//  passport,
+//  passportLocal,
+//  passportHttp.BasicStrategy,
+//  passportOAuth2ClientPassword.Strategy,
+//  passportHttpBearer.Strategy,
+//  oauth2orize);
 routes.LibraryController.initFormidable(formidable, config.FileUploadConfig.audio);
 routes.LibraryController.setMusicMetadata(musicMetaData);
 
@@ -62,26 +74,34 @@ router.route("/")
   .get(routes.HomeController.getIndex);
 router.route("/login")
   .get(routes.AuthController.getSignIn)
-  .post(routes.AuthController.authenticateLocal, routes.AuthController.postSignIn);
+  .post(services.Authentication.authenticateLocal, routes.AuthController.postSignIn);
 router.route("/join")
   .get(routes.AuthController.getSignUp)
   .post(routes.AuthController.postSignUp);
 router.route("/logout")
   .get(routes.AuthController.getSignOut);
 router.route("/library")
-  .get(routes.AuthController.isLocalAuthenticated, routes.LibraryController.getLibrary);
+  .get(services.Authentication.isLocalAuthenticated, routes.LibraryController.getLibrary);
 router.route("/library/upload")
-  .get(routes.AuthController.isLocalAuthenticated, routes.HomeController.getIndex)
+  .get(services.Authentication.isLocalAuthenticated, routes.HomeController.getIndex)
   .post(routes.LibraryController.postUpload);
 router.route("/api/v1/library/list")
-  .get(routesRestV1.LibraryRestController.getLibrary);
-
+  .get(services.Authentication.authenticateBearer, routesRestV1.LibraryRestController.getLibrary);
 router.route("/token")
-  .post(routes.AuthController.token);
+  .post(services.Authentication.token);
 router.route("/api/v1/user")
-  .get(routes.AuthController.authenticateBearer, function(req, res){
+  .get(services.Authentication.authenticateBearer, function(req, res){
     res.json({ userId: req.user.userId, email: req.user.email, scope: req.authInfo.scope });
   });
+
+//socket handling
+//io.set("authorization", function(){
+//  console.log(arguments);
+//});
+io.sockets.on("connection", function(socket){
+  socket.emit("hello", { hello: "world" });
+  console.log("connected");
+})
 
 app.use('/', router);
 
@@ -115,6 +135,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
 
 module.exports = app;

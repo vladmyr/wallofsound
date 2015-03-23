@@ -34,9 +34,10 @@ html(ng-app="app")
                   a(href="/logout") #[span.glyphicon.glyphicon-off.glyphicon-sm.margin-right-sm] Logout
     div.container.fixed-top-offset
       block content
+
+    script(type="text/javascript", src="/vendor/socket.io/socket.io.js")
     script(type="text/javascript", src="/vendor/jquery/jquery.min.js")
     script(type="text/javascript", src="/vendor/angularjs/angular.min.js")
     script(type="text/javascript", src="/vendor/angular-route/angular-route.min.js")
     script(type="text/javascript", src="/vendor/bootstrap/js/bootstrap.min.js")
-    script(type="text/javascript", src="http://cdn.binaryjs.com/0/binary.js")
     script(type="text/javascript", src="/javascripts/index.js")

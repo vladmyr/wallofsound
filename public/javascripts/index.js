@@ -1,6 +1,13 @@
 console.log("index.js");
 
 angular.module("app", ["ngRoute"])
+  .factory("AudioStreamingFactory", function(){
+    var socket = io.connect("http://localhost:3000");
+    socket.on("hello", function(data){
+      console.log(data);
+    });
+    return socket;
+  })
   .factory("LibraryFactory", function($http){
     var library = [];
 
@@ -29,6 +36,10 @@ angular.module("app", ["ngRoute"])
         return library;
       }
     }
+  })
+  .controller("HomeController", function($scope, AudioStreamingFactory){
+    console.log("HomeController");
+    AudioStreamingFactory;
   })
   .controller("LibraryController", function($scope, LibraryFactory){
     $scope.library = [];
