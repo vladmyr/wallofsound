@@ -1,10 +1,44 @@
 extends ../layout
 
 block content
-  div(ng-controller="LibraryController")
+  .player.col-md-3
+    .controls.inline
+      .fixed
+        .inline
+          a
+            span.glyphicon.glyphicon-step-backward
+        .inline
+          a
+            span.glyphicon.glyphicon-play
+        .inline
+          a
+            span.glyphicon.glyphicon-step-forward
+      .now-playing.col-xs-12
+        p <b>Undimmed By Time, Unbound By Deat</b>
+        p M83, Anthony Gonzalez, Joseph Trapanese
+    .progress
+      .progress-bar.progress-bar-playing(style="width: 20%")
+      .progress-bar.progress-bar-buffering(style="width: 50%")
+    ul.settings.list-inline.list-unstyled
+      li
+        a.heart
+          span.glyphicon.glyphicon-heart-empty
+      li
+        a
+          span.glyphicon.glyphicon-random
+      li
+        a
+          span.glyphicon.glyphicon-th-list
+      li
+        a
+          span.glyphicon.glyphicon-list-alt
+      .progress-time
+        p 0:45/3:40
+    .queue
+  .player.col-md-9(ng-controller="LibraryController")
     table.table.table-hover.table-library
       tbody
-        tr(ng-repeat="item in library")
+        tr(ng-repeat="item in library").ng-cloak
           td {{item.title}}
           td {{item.Album.Artist.name}}
           td {{item.Album.title}}

@@ -1,18 +1,19 @@
 extends ../layout
 
 block content
-  h3.text-center #{title}
-  h4.text-center Welcome!
-  form(action="/join", method="POST", class="contains-background-layer")
-    input(type="hidden", name="_csrf" value="")
-    .form-group
-      label Email
-      input(type="text", class="form-control", name="email", placeholder="you@email.com", required="true")
-    .form-group
-      label Password
-      input(type="password", class="form-control", name="password", placeholder="secret-password", required="true")
-    .form-group
-      p Already have an account? Click here to #[a(href="/login") login]!
-    input(type="submit", class="btn btn-default", value="Join")
-    .background-el.bottom-right
-      span.glyphicon-background.glyphicon.glyphicon-forward.glyphicon-xl
+  .container
+    h3.text-center #{title}
+    h4.text-center Welcome!
+    form(action="/join", method="POST", class="contains-background-layer")
+      input(type="hidden", name="_csrf" value="")
+      .form-group
+        label Email
+        input(type="text", class="form-control", name="email", placeholder="you@email.com", required="true")
+      .form-group
+        label Password
+        input(type="password", class="form-control", name="password", placeholder="secret-password", required="true")
+      .form-group
+        p Already have an account? Click here to #[a(href="/login") login]!
+      input(type="submit", class="btn btn-default", value="Join")
+      .background-el.bottom-right
+        span.glyphicon-background.glyphicon.glyphicon-forward.glyphicon-xl

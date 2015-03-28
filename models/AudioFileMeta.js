@@ -5,7 +5,8 @@ module.exports = function(sequelize, DataTypes){
     title: { type: DataTypes.STRING, allowNull: false },
     trackNo: DataTypes.INTEGER,
     duration: DataTypes.INTEGER,
-    filePath: { type: DataTypes.STRING, allowNull: false, unique: true }
+    filePath: { type: DataTypes.STRING, allowNull: false, unique: true },
+    fileSize: { type: DataTypes.STRING, allowNull: false, defaultValue: 0 }
   }, {
     classMethods: {
       associate: function(models){

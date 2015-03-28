@@ -1,5 +1,6 @@
 PROJECT_ROOT = __dirname;
 
+var fs = require("fs");
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -15,6 +16,8 @@ var passportOAuth2ClientPassword = require("passport-oauth2-client-password");
 var oauth2orize = require("oauth2orize");
 
 var io = require("socket.io")();
+var binaryServer = require("binaryjs").createServer();
+var ioStream = require("socket.io-stream");
 
 var session = require("express-session");
 var formidable = require("formidable");
@@ -27,6 +30,7 @@ var routesRestV1 = require("./routes/rest/v1");
 var app = express();
 
 app.io = io;
+app.binaryServer = binaryServer;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -86,7 +90,7 @@ router.route("/library/upload")
   .get(services.Authentication.isLocalAuthenticated, routes.HomeController.getIndex)
   .post(routes.LibraryController.postUpload);
 router.route("/api/v1/library/list")
-  .get(services.Authentication.authenticateBearer, routesRestV1.LibraryRestController.getLibrary);
+  .get(services.Authentication.isLocalAuthenticated, routesRestV1.LibraryRestController.getLibrary);
 router.route("/token")
   .post(services.Authentication.token);
 router.route("/api/v1/user")
@@ -95,13 +99,39 @@ router.route("/api/v1/user")
   });
 
 //socket handling
+binaryServer.listen(3001).on("connection", function(client){
+  console.log(client);
+  var rstream = fs.createReadStream("/home/vladmyr/Development/js/wallofsound02/uploads/1/upload_1f3e95ff327bca40094f5ccfe03cbc97.mp3");
+  client.send(rstream);
+});
+
+
 //io.set("authorization", function(){
 //  console.log(arguments);
 //});
-io.sockets.on("connection", function(socket){
-  socket.emit("hello", { hello: "world" });
-  console.log("connected");
-})
+//io.sockets
+//  .on("connection", function(socket){
+//    //socket.emit("hello", { hello: "world" });
+//    //console.log("connected");
+//    //socket.on("event01", function(data){
+//    //  console.log(data);
+//    //});
+//    //io.on("reqStream", function(data){
+//    //
+//    //  ioStream(socket).emit("resStream", stream);
+//    //  rstream.pipe(stream);
+//    //});
+//
+//    var rstream = fs.createReadStream("/home/vladmyr/Development/js/wallofsound02/uploads/1/upload_1f3e95ff327bca40094f5ccfe03cbc97.mp3", { encoding: "base64" });
+//    var stream = ioStream.createStream({ highWaterMark: 2 * 1024 * 1024, encoding: "base64" });
+//    ioStream(socket).emit("resStream", stream);
+//    rstream.pipe(stream);
+//
+//    socket.on("disconnect", function(){
+//      console.log("disconnected");
+//    });
+//  });
+
 
 app.use('/', router);
 

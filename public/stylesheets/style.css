@@ -3,9 +3,10 @@ html {
   min-height: 100%;
   height: 1px;
 }
-.relative {
-  position: relative;
-}
+.ng-cloak { display: none; }
+.relative { position: relative; }
+.inline { display: inline-block; }
+.fixed { position: fixed; }
 .brand-fixed {
   position: fixed;
   width: 136px;
@@ -15,10 +16,6 @@ html {
 }
 .settings-offset-right {
   padding-right: 124px;
-}
-.settings {
-  position: fixed;
-  right: 0;
 }
 .settings .dropdown-menu>li>a:hover,
 .settings .dropdown-menu>li>a:focus {
@@ -110,11 +107,6 @@ html {
   margin: 0;
   font-weight: bold;
 }
-.player .player-playing .progress {
-  margin-top: 8px;
-  margin-bottom: 0;
-  height: 8px;
-}
 .player .player-album-cover {
   width: 36px;
   height: 36px;
@@ -131,12 +123,78 @@ html {
 .player .player-fixed-1-offset {
   padding-left: 158px;
 }
+.player {
+  /*background-color: #f0f0f0;*/
+}
+.player .controls { margin: 0; }
+.player .controls .fixed { z-index: 1; }
+.player .controls a {
+  color: #434a54;
+  font-size: 20px;
+  margin: 0 10px 0px 0;
+
+}
+.player .settings>li>a:hover,
+.player .controls a:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.player .now-playing {
+  padding-left: 90px;
+  padding-right: 0;
+}
+.player .now-playing>p {
+  margin: 0;
+  line-height: 12px;
+  font-size: 12px;
+  height: 12px;
+  overflow: hidden;
+  word-break: break-all;
+}
+.player .progress-time>p {
+  margin: 0;
+  font-size: 10px;
+  line-height: 10px;
+}
+.player .progress-time .elapsed { float: left; }
+.player .progress-time .total { float: right; }
+.player .progress {
+  margin-top: 8px;
+  margin-bottom: 0;
+  height: 5px;
+}
+.player .progress-time {
+  float: right;
+  padding-right: 0;
+  margin: 0;
+}
+.player .progress-time>p {
+  margin: 0;
+  line-height: 10px;
+  font-size: 10px;
+}
+.player .settings {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.player .settings>li {
+  margin-right: 6px;
+}
+.player .settings>li>a { color: #434a54; }
+.player .settings>li>.heart.checked,
+.player .settings>li>.heart:hover { color: #FF6C69; }
 .progress-bar-playing {
-  background-color: #434a54;
-  background-image: -webkit-linear-gradient(top, #434a54 0, #434a54 100%);
-  background-image: -o-linear-gradient(top, #434a54 0, #434a54 100%);
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#434a54), to(#434a54));
-  background-image: linear-gradient(to bottom, #434a54 0, #434a54 100%);
+  background-image: -webkit-linear-gradient(top, #707c8c 0, #434a54 100%);
+  background-image: -o-linear-gradient(top, #707c8c 0, #434a54 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#707c8c), to(#434a54));
+  background-image: linear-gradient(to bottom, #707c8c 0, #434a54 100%);
+}
+.progress-bar-buffering{
+  background-image: -webkit-linear-gradient(top, #dbdbdb 0, #dbdbdb 100%);
+  background-image: -o-linear-gradient(top, #dbdbdb 0, #dbdbdb 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#dbdbdb), to(#dbdbdb));
+  background-image: linear-gradient(to bottom, #dbdbdb 0, #dbdbdb 100%);
 }
 .divider.divider-xs { margin: 0 }
 .divider.divider-sm { margin: 4px 0 }

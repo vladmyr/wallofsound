@@ -1,0 +1,8 @@
+@-webkit-keyframes anim01 {
+  from {}
+  to { color: #52C5FF; }
+}
+@keyframes anim01 {
+  from {}
+  to { color: #52C5FF; }
+}

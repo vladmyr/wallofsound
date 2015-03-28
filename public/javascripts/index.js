@@ -1,12 +1,96 @@
 console.log("index.js");
 
 angular.module("app", ["ngRoute"])
-  .factory("AudioStreamingFactory", function(){
-    var socket = io.connect("http://localhost:3000");
-    socket.on("hello", function(data){
-      console.log(data);
-    });
-    return socket;
+  .factory("AuthenticationFactory", function(){
+    var credentials = {};
+  })
+  .factory("WebAudioPlayerFactory", function(){
+    var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    var soundSource;
+    var soundBuffer;
+
+    var encodedBuffer;
+    var activeBuffer = new Uint8Array(0);
+    var arrChunk = [];
+
+    var chunkIndex = 0;
+    var totalChunksLoaded = 0;
+
+    function init(){
+
+    }
+
+    function mergeChunks(chunk1, chunk2){
+      var uint8Array = new Uint8Array(chunk1.length + chunk2.length);
+      uint8Array.set(chunk1, 0);
+      uint8Array.set(chunk2, chunk1.length);
+      return uint8Array;
+    }
+
+    function loadChunk(chunk){
+      if(totalChunksLoaded === 0){
+        activeBuffer = chunk;
+      }else{
+        activeBuffer = mergeChunks(activeBuffer, chunk);
+      }
+
+      audioContext.decodeAudioData(activeBuffer.buffer, function(buffer){
+        soundBuffer = buffer;
+        play();
+        console.log("chunk decoded");
+      });
+
+      totalChunksLoaded++;
+    }
+
+    function play(){
+
+    }
+
+    function stop(){
+
+    }
+
+    function pause(){
+
+    }
+
+    return {
+      setSoundBuffer: function(stream){
+
+      },
+      addSoundBufferChunk: function(chunk){
+        loadChunk(chunk);
+
+      },
+      play: function(){
+
+      }
+    }
+  })
+  .factory("AudioStreamingFactory", function(WebAudioPlayerFactory){
+    //var binaryClient = new BinaryClient("ws://localhost:3001");
+    //var length = 0;
+    //var arrChunk = [];
+    //var buffer;
+    //var audio = new Audio();
+    //
+    //binaryClient.on("stream", function(stream, meta){
+    //  stream.on("data", function(chunk){
+    //    arrChunk.push(chunk);
+    //  })
+    //  stream.on("end", function(){
+    //    console.log("streaming done");
+    //
+    //    audio.src = (window.URL || window.webkitURL).createObjectURL(new Blob(arrChunk));
+    //    audio.play();
+    //  })
+    //});
+
+    return {
+      getStream: function(path){
+      }
+    };
   })
   .factory("LibraryFactory", function($http){
     var library = [];
@@ -39,17 +123,15 @@ angular.module("app", ["ngRoute"])
   })
   .controller("HomeController", function($scope, AudioStreamingFactory){
     console.log("HomeController");
-    AudioStreamingFactory;
   })
-  .controller("LibraryController", function($scope, LibraryFactory){
+  .controller("LibraryController", function($scope, LibraryFactory, AudioStreamingFactory){
     $scope.library = [];
-    $scope.binaryClient = new BinaryClient("ws://localhost:3000/stream");
-
-    console.log("binaryClient", $scope.binaryClient);
 
     LibraryFactory.requestLibrary(function(data, status){
       if(status === 200){
         $scope.library = data;
+        console.log("library", data);
+        //AudioStreamingFactory.getStream($scope.library[0].filePath);
       }
     });
   });
