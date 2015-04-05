@@ -115,5 +115,6 @@ angular.module("app", ["ngRoute"])
         $scope.library = data;
         console.log("library", data);
       }
+      //for commit local/#1
     });
   });
