@@ -115,6 +115,6 @@ angular.module("app", ["ngRoute"])
         $scope.library = data;
         console.log("library", data);
       }
-      //local/#2 01
+      //local/#2 02
     });
   });
