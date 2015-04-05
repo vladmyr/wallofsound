@@ -115,6 +115,6 @@ angular.module("app", ["ngRoute"])
         $scope.library = data;
         console.log("library", data);
       }
-      //for commit
+      //for merge from local/#1 to master
     });
   });
