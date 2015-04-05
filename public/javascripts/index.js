@@ -114,7 +114,6 @@ angular.module("app", ["ngRoute"])
       if(status === 200){
         $scope.library = data;
         console.log("library", data);
-        //AudioStreamingFactory.getStream($scope.library[0].filePath);
       }
     });
   });
