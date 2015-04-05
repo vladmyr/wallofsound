@@ -69,23 +69,6 @@ angular.module("app", ["ngRoute"])
     }
   })
   .factory("AudioStreamingFactory", function(WebAudioPlayerFactory){
-    //var binaryClient = new BinaryClient("ws://localhost:3001");
-    //var length = 0;
-    //var arrChunk = [];
-    //var buffer;
-    //var audio = new Audio();
-    //
-    //binaryClient.on("stream", function(stream, meta){
-    //  stream.on("data", function(chunk){
-    //    arrChunk.push(chunk);
-    //  })
-    //  stream.on("end", function(){
-    //    console.log("streaming done");
-    //
-    //    audio.src = (window.URL || window.webkitURL).createObjectURL(new Blob(arrChunk));
-    //    audio.play();
-    //  })
-    //});
 
     return {
       getStream: function(path){
