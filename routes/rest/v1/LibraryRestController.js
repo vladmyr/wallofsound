@@ -6,10 +6,10 @@ var LibraryRestController = {};
 LibraryRestController.getLibrary = function(req, res){
   if(req.isAuthenticated()){
     services.Library.list(req.user.id, function(rows){
-      res.send(JSON.stringify(rows));
+      res.json(rows);
     });
   }else{
-    res.send(403).send("You are not authenticated");
+    res.status(403).send("You are not authenticated");
   }
 }
 

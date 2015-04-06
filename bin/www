@@ -21,7 +21,6 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
-//var io = app.io;
 var binaryServer = app.binaryServer;
 
 /**
@@ -66,6 +65,8 @@ function normalizePort(val) {
  */
 
 function onError(error) {
+  binaryServer.close();
+
   if (error.syscall !== 'listen') {
     throw error;
   }

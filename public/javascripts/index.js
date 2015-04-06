@@ -4,96 +4,87 @@ angular.module("app", ["ngRoute"])
   .factory("AuthenticationFactory", function(){
     var credentials = {};
   })
-  .factory("WebAudioPlayerFactory", function(){
-    var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    var soundSource;
-    var soundBuffer;
+  .factory("AudioStreamingFactory", function(){
+    var player = new Player();
+    var binaryClient;
+    var byteLength = 0;
 
-    var encodedBuffer;
-    var activeBuffer = new Uint8Array(0);
-    var arrChunk = [];
+    var onAudioStreamData = function(){};
+    var onAudioStreamEnd = function(){};
+    var onAudioStreamCallback = function(stream, meta){
+      var arrChunk = [];
 
-    var chunkIndex = 0;
-    var totalChunksLoaded = 0;
+      byteLength = 0;
+
+      stream.on("data", function(chunk){
+        arrChunk.push(chunk);
+        byteLength += chunk.byteLength;
+
+        if(typeof onAudioStreamData === "function"){
+          onAudioStreamData(byteLength, chunk, arrChunk);
+        }
+      });
+      stream.on("end", function(){
+        player.setSource(new Blob(arrChunk));
+        player.play();
+
+        if(typeof onAudioStreamEnd === "function"){
+          onAudioStreamData(byteLength, arrChunk);
+        }
+      });
+    };
+
+    function togglePlay(){
+      player.isPlaying() ? player.pause() : player.play();
+    }
 
     function init(){
-
-    }
-
-    function mergeChunks(chunk1, chunk2){
-      var uint8Array = new Uint8Array(chunk1.length + chunk2.length);
-      uint8Array.set(chunk1, 0);
-      uint8Array.set(chunk2, chunk1.length);
-      return uint8Array;
-    }
-
-    function loadChunk(chunk){
-      if(totalChunksLoaded === 0){
-        activeBuffer = chunk;
-      }else{
-        activeBuffer = mergeChunks(activeBuffer, chunk);
-      }
-
-      audioContext.decodeAudioData(activeBuffer.buffer, function(buffer){
-        soundBuffer = buffer;
-        play();
-        console.log("chunk decoded");
+      binaryClient = new BinaryClient("ws://localhost:3001");
+      binaryClient.on("open", function(){
+        //send token
+        this.send({}, JSON.stringify({ event: 1 }));
+        //this.close();
       });
-
-      totalChunksLoaded++;
+      binaryClient.on("stream", function(data, meta){
+        meta = JSON.parse(meta); //deserialize json
+        switch(meta.event){
+          case 0:
+            onAudioStreamCallback(data, meta);
+            break;
+          case 1:
+            console.log(meta);
+            break;
+        }
+      });
+      binaryClient.on("close", function(){
+        console.log("connection closed");
+      });
     }
 
-    function play(){
+    function getStream(id, onDataCallback, onEndCallback){
+      onAudioStreamData = onDataCallback;
+      onAudioStreamEnd = onEndCallback;
 
-    }
-
-    function stop(){
-
-    }
-
-    function pause(){
-
+      binaryClient.send({}, JSON.stringify({
+        event: 0,
+        token: {
+          userId: 1
+        },
+        trackId: id
+      }));
+      //binaryClient.on("stream", onAudioStreamCallback(data, meta));
     }
 
     return {
-      setSoundBuffer: function(stream){
-
-      },
-      addSoundBufferChunk: function(chunk){
-        loadChunk(chunk);
-
-      },
-      play: function(){
-
-      }
-    }
-  })
-  .factory("AudioStreamingFactory", function(WebAudioPlayerFactory){
-    //var binaryClient = new BinaryClient("ws://localhost:3001");
-    //var length = 0;
-    //var arrChunk = [];
-    //var buffer;
-    //var audio = new Audio();
-    //
-    //binaryClient.on("stream", function(stream, meta){
-    //  stream.on("data", function(chunk){
-    //    arrChunk.push(chunk);
-    //  })
-    //  stream.on("end", function(){
-    //    console.log("streaming done");
-    //
-    //    audio.src = (window.URL || window.webkitURL).createObjectURL(new Blob(arrChunk));
-    //    audio.play();
-    //  })
-    //});
-
-    return {
-      getStream: function(path){
-      }
+      init: init,
+      getStream: getStream,
+      togglePlay: togglePlay,
+      byteLength: byteLength
     };
   })
   .factory("LibraryFactory", function($http){
     var library = [];
+    var count = 0;
 
     return {
       requestLibrary: function(callback){
@@ -107,7 +98,8 @@ angular.module("app", ["ngRoute"])
         $http(request)
           .success(function(data, status){
             if(status === 200){
-              library = data ? data : [];
+              library = data ? data.rows : [];
+              count = data ? data.count : 0;
             }
             callback(data, status);
           })
@@ -118,6 +110,9 @@ angular.module("app", ["ngRoute"])
       },
       getLibrary: function(){
         return library;
+      },
+      getCount: function(){
+        return count;
       }
     }
   })
@@ -125,13 +120,39 @@ angular.module("app", ["ngRoute"])
     console.log("HomeController");
   })
   .controller("LibraryController", function($scope, LibraryFactory, AudioStreamingFactory){
-    $scope.library = [];
+    $scope.indexedLibrary = _.indexBy(LOCALS.library, "id");
+    $scope.iconPlay = true;
+    $scope.buffered = 0;
+    $scope.elapsed = 0;
+    $scope.count = 0;
+    $scope.loadedPersents = 0;
+    //$scope.audio = AudioStreamingFactory.getAudio;
 
-    LibraryFactory.requestLibrary(function(data, status){
-      if(status === 200){
-        $scope.library = data;
-        console.log("library", data);
-        //AudioStreamingFactory.getStream($scope.library[0].filePath);
-      }
-    });
+    //$scope.getDuration = AudioStreamingFactory.getDuration;
+    $scope.getTime = AudioStreamingFactory.getTime;
+    $scope.togglePlay = AudioStreamingFactory.togglePlay;
+    $scope.play = function(id){
+      console.log("action play, id: ", id + ", size: " + $scope.indexedLibrary[id].fileSize);
+
+      $scope.totalByteLength = $scope.indexedLibrary[id].fileSize;
+      AudioStreamingFactory.getStream(id, function(byteLength){
+        $scope.$apply(function(){
+          $scope.loadedPersents = Math.floor(byteLength / $scope.totalByteLength * 100);
+          console.log($scope.loadedPersents);
+        });
+      });
+    }
+
+    AudioStreamingFactory.init();
+    //LibraryFactory.requestLibrary(function(data, status){
+    //  if(status === 200){
+    //    $scope.library = LibraryFactory.getLibrary();
+    //    $scope.library[0].isFavourite = true;
+    //    $scope.count = LibraryFactory.getCount();
+    //    console.log("library", $scope.library);
+    //    console.log("count", $scope.count);
+    //    AudioStreamingFactory.init();
+    //    //AudioStreamingFactory.getStream($scope.library[0].filePath);
+    //  }
+    //});
   });

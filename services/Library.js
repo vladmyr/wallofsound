@@ -5,7 +5,7 @@ var Library = {};
 
 Library.list = function(userId, callback){
   if(typeof callback === "function"){
-    models.AudioFileMeta.findAll({
+    models.AudioFileMeta.findAndCountAll({
       include: [{
         model: models.Album,
         include: [{
@@ -17,6 +17,17 @@ Library.list = function(userId, callback){
       }
     }).then(callback);
   }
+}
+
+Library.getFilePath = function(userId, trackId, callback){
+  models.AudioFileMeta.find({
+    where: {
+      id: trackId,
+      UserId: userId
+    }
+  }).then(function(track){
+    callback(track.filePath);
+  });
 }
 
 module.exports = Library;

@@ -90,19 +90,33 @@ router.route("/library/upload")
   .get(services.Authentication.isLocalAuthenticated, routes.HomeController.getIndex)
   .post(routes.LibraryController.postUpload);
 router.route("/api/v1/library/list")
-  .get(services.Authentication.isLocalAuthenticated, routesRestV1.LibraryRestController.getLibrary);
-router.route("/token")
-  .post(services.Authentication.token);
+  .get(routesRestV1.LibraryRestController.getLibrary);
 router.route("/api/v1/user")
   .get(services.Authentication.authenticateBearer, function(req, res){
     res.json({ userId: req.user.userId, email: req.user.email, scope: req.authInfo.scope });
   });
+router.route("/token")
+  .post(services.Authentication.token);
 
 //socket handling
 binaryServer.listen(3001).on("connection", function(client){
   console.log(client);
-  var rstream = fs.createReadStream("/home/vladmyr/Development/js/wallofsound02/uploads/1/upload_1f3e95ff327bca40094f5ccfe03cbc97.mp3");
-  client.send(rstream);
+  client.on("stream", function(stream, meta){
+    meta = JSON.parse(meta);
+    switch(meta.event){
+      case 0:
+        //ToDo: client token validation
+        services.Library.getFilePath(meta.token.userId, meta.trackId, function(path){
+          var rstream = fs.createReadStream(path);
+          client.send(rstream, JSON.stringify({ event: 0 }));
+        });
+        break;
+      case 1:
+        client.send({}, JSON.stringify({ event: 1, message: "message" }));
+        break;
+    }
+    //console.log("message", data, meta);
+  });
 });
 
 

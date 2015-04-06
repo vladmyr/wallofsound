@@ -54,7 +54,7 @@ AuthController.getSignUp = function(req, res){
   res.render("auth/join", { title: "Join WallOfSound" });
 }
 AuthController.postSignIn = function(req, res){
-  res.redirect("/");
+  res.redirect("/library");
 }
 AuthController.postSignUp = function(req, res){
   if(typeof req.body.email !== "undefined"

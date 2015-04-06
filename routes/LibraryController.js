@@ -1,10 +1,12 @@
 "use strict";
 
+var _ = require("underscore");
 var fs = require("fs");
 var path = require("path");
 var services = require("../services");
 var models = require("../models");
 var LibraryController = {};
+var Promise = require("promise");
 
 LibraryController.initFormidable = function(formidable, options){
   LibraryController.formidable = formidable;
@@ -24,12 +26,22 @@ LibraryController.setMusicMetadata = function(musicMetaData){
 
 LibraryController.getLibrary = function(req, res){
   if(req.isAuthenticated()){
-    //services.Library.list(req.user.id, function(rows){
-    //  res.send(JSON.stringify(rows));
-    //});
-    res.render("library/library", new services.Model(req));
+    var locals = new services.Model(req);
+    new Promise.resolve().then(function(){
+      return new Promise(function(fulfill, reject){
+        locals.library = [];
+        services.Library.list(req.user.id, function(data){
+          _.toArray(data.rows).forEach(function(track){
+            locals.library.push(track.get({ plain: true }));
+          });
+          fulfill();
+        });
+      });
+    }).then(function(){
+      res.render("library/library", locals);
+    })
   }else{
-    res.send(403).send("You are not authenticated");
+    res.status(403).send("You are not authenticated");
   }
 }
 
@@ -83,8 +95,9 @@ function proceedFile(userId, file, callback){
             UserId: userId,
             title: metadata.title !== "" ? metadata.title : file.name,
             trackNo: metadata.track && metadata.track.no ? metadata.track.no : 0,
-            duration: 0,
-            filePath: path.join(uploadDestination, filename)
+            duration: metadata.duration? metadata.duration : 0,
+            filePath: path.join(uploadDestination, filename),
+            fileSize: file.size? file.size : 0
           }).then(function(audioFileMeta){
             models.Artist.findOrCreate({ where: { name: metadata.artist[0] }})
               .spread(function(artist){

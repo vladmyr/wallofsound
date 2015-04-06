@@ -1,45 +1,89 @@
 extends ../layout
 
+block head
 block content
-  .player.col-md-3
-    .controls.inline
-      .fixed
-        .inline
+  div(ng-controller="LibraryController")
+    .player.col-md-3
+      .controls.inline
+        .fixed
+          .inline
+            a
+              span.glyphicon.glyphicon-step-backward
+          .inline
+            a(href="javascript:void(0)", ng-click="togglePlay()")
+              span.glyphicon.glyphicon-play
+          .inline
+            a
+              span.glyphicon.glyphicon-step-forward
+        .now-playing.col-xs-12
+          p <b>Undimmed By Time, Unbound By Deat</b>
+          p M83, Anthony Gonzalez, Joseph Trapanese
+      .progress
+        .progress-bar.progress-bar-playing(style="width: 0%")
+        .progress-bar.progress-bar-buffering(style="width: {{loadedPersents}}%")
+      ul.settings.list-inline.list-unstyled
+        li
+          a.heart
+            span.glyphicon.glyphicon-heart-empty
+        li
           a
-            span.glyphicon.glyphicon-step-backward
-        .inline
+            span.glyphicon.glyphicon-random
+        li
           a
-            span.glyphicon.glyphicon-play
-        .inline
+            span.glyphicon.glyphicon-th-list
+        li
           a
-            span.glyphicon.glyphicon-step-forward
-      .now-playing.col-xs-12
-        p <b>Undimmed By Time, Unbound By Deat</b>
-        p M83, Anthony Gonzalez, Joseph Trapanese
-    .progress
-      .progress-bar.progress-bar-playing(style="width: 20%")
-      .progress-bar.progress-bar-buffering(style="width: 50%")
-    ul.settings.list-inline.list-unstyled
-      li
-        a.heart
-          span.glyphicon.glyphicon-heart-empty
-      li
-        a
-          span.glyphicon.glyphicon-random
-      li
-        a
-          span.glyphicon.glyphicon-th-list
-      li
-        a
-          span.glyphicon.glyphicon-list-alt
-      .progress-time
-        p 0:45/3:40
-    .queue
-  .player.col-md-9(ng-controller="LibraryController")
-    table.table.table-hover.table-library
-      tbody
-        tr(ng-repeat="item in library").ng-cloak
-          td {{item.title}}
-          td {{item.Album.Artist.name}}
-          td {{item.Album.title}}
-          td {{item.Album.year}}
+            span.glyphicon.glyphicon-list-alt
+        .progress-time.ng-cloak
+          p 0:00/0:00
+          {{loadedPersents}}
+      .queue
+    .col-md-9
+      h6.header6
+        b Library
+      table.table.table-hover.table-library
+        thead
+          tr
+            th
+            th Name
+            th Artist
+            th Time
+            th Album
+            th Year
+            th Favourite
+            th Listened
+        tbody
+          for track in library
+            tr(data-id= track.id,
+            data-artist= track.Album.Artist.name,
+            data-album= track.Album.title,
+            data-duration= track.getFormattedDuration,
+            data-favourite= track.isFavourite)
+              td
+                a.library-control(href="javascript:void(0)", ng-click="play("+ track.id + ")")
+                  span.glyphicon.glyphicon-play.glyphicon-xs
+              td= track.title
+              td= track.Album.Artist.name
+              td= track.getFormattedDuration
+              td= track.Album.title
+              td= track.Album.year
+              td
+                if track.isFavourite
+                  span.glyphicon.glyphicon-heart.glyphicon-xs
+                else
+                  span.glyphicon.glyphicon-heart-empty.glyphicon-xs
+              td= track.listenCount
+          //tr(ng-repeat="item in library").ng-cloak
+          //  td
+          //    a(href="javascript:void(0)", ng-click="play(item.filePath)")
+          //      span.glyphicon.glyphicon-play.glyphicon-xs
+          //  td {{item.title}}
+          //  td {{item.Album.Artist.name}}
+          //  td {{getTime(item.duration)}}
+          //  td {{item.Album.title}}
+          //  td {{item.Album.year}}
+          //  td
+          //    span(ng-class="item.isFavourite? 'glyphicon glyphicon-heart glyphicon-xs' : 'glyphicon glyphicon-heart-empty glyphicon-xs'")
+          //  td {{item.listenCount}}
+        tfoot
+  script(src="/javascripts/Player.js", type="text/javascript")

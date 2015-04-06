@@ -8,6 +8,8 @@ html(ng-app="app")
     link(rel="stylesheet", href="/vendor/bootflat/css/bootflat.min.css")
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel="stylesheet", href="/stylesheets/animation.css")
+
+    block head
   body
     nav.row.navbar.navbar-custom.navbar-fixed-top
       .col-xs-12
@@ -36,6 +38,10 @@ html(ng-app="app")
     div.fixed-top-offset
       block content
 
+    script.
+      //globals
+      window.LOCALS = !{JSON.stringify(locals)};
+      console.log(LOCALS);
     script(type="text/javascript", src="http://cdn.binaryjs.com/0/binary.js")
     script(type="text/javascript", src="/vendor/socket.io/socket.io.js")
     script(type="text/javascript", src="/vendor/socket.io-stream/socket.io-stream.js")
@@ -43,4 +49,5 @@ html(ng-app="app")
     script(type="text/javascript", src="/vendor/angularjs/angular.min.js")
     script(type="text/javascript", src="/vendor/angular-route/angular-route.min.js")
     script(type="text/javascript", src="/vendor/bootstrap/js/bootstrap.min.js")
+    script(type="text/javascript", src="/vendor/underscore/underscore-min.js")
     script(type="text/javascript", src="/javascripts/index.js")
