@@ -100,7 +100,6 @@ router.route("/token")
 
 //socket handling
 binaryServer.listen(3001).on("connection", function(client){
-  console.log(client);
   client.on("stream", function(stream, meta){
     meta = JSON.parse(meta);
     switch(meta.event){
@@ -115,7 +114,6 @@ binaryServer.listen(3001).on("connection", function(client){
         client.send({}, JSON.stringify({ event: 1, message: "message" }));
         break;
     }
-    //console.log("message", data, meta);
   });
 });
 
