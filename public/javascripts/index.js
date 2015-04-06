@@ -74,6 +74,11 @@ angular.module("app", ["ngRoute"])
       }));
       //binaryClient.on("stream", onAudioStreamCallback(data, meta));
     }
+<<<<<<< HEAD
+=======
+  })
+  .factory("AudioStreamingFactory", function(WebAudioPlayerFactory){
+>>>>>>> f9adf9b73ed95f6032960a83ad88d502f98f37e5
 
     return {
       init: init,
